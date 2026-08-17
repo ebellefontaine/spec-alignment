@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- Node.js 20 runtime (`runs.using: node20` in `action.yml`) — matches GitHub Actions' current supported runtime.
+- Node.js 24 runtime (`runs.using: node24` in `action.yml`). GitHub Actions is deprecating Node 20 in 2026 (runners default to Node 24 as of June 2026, per https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/) — node24 is the current supported target, not node20.
 - Same-repo PRs only for v1 — no `pull_request_target` handling, no fork-specific logic anywhere in this plan.
 - Narrative spec formats only — no OpenAPI/AsyncAPI/TypeSpec contract-conformance logic.
 - One LLM provider per run — no fallback-chain logic.
@@ -736,9 +736,7 @@ export function filterByRelevance(
   const changedDirs = diffFiles.map((file) => dirname(file.path));
   const relevantDocs = sourceDocuments.filter((doc) => {
     const docDir = dirname(doc.path);
-    return changedDirs.some(
-      (dir) => dir.startsWith(docDir) || docDir.startsWith(dir) || sharesPathSegment(dir, docDir)
-    );
+    return changedDirs.some((dir) => dir.startsWith(docDir) || docDir.startsWith(dir));
   });
   const narrowedDocs = relevantDocs.length > 0 ? relevantDocs : sourceDocuments;
   const narrowedEstimate = estimateTokens(diffFiles, narrowedDocs);
@@ -754,13 +752,9 @@ function dirname(path: string): string {
   const idx = path.lastIndexOf('/');
   return idx === -1 ? '.' : path.slice(0, idx);
 }
-
-function sharesPathSegment(a: string, b: string): boolean {
-  const segmentsA = a.split('/').filter(Boolean);
-  const segmentsB = b.split('/').filter(Boolean);
-  return segmentsA.some((segment) => segmentsB.includes(segment));
-}
 ```
+
+Note: narrowing uses only ancestor/descendant directory-prefix matching (`dir.startsWith(docDir) || docDir.startsWith(dir)`) — deliberately no generic "shares any path segment" fallback, since that would match unrelated sibling directories (e.g. `src/billing` and `src/shipping` both containing `src`) and defeat the point of narrowing.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -1252,12 +1246,16 @@ describe('runAction', () => {
   });
 
   it('escalates to an LLM relevance-filter pass when the deterministic filter is still over budget, then proceeds', async () => {
-    const bigPatch = 'x'.repeat(1_000_000);
+    // Sized so the full set (100k + 100k + 500k chars = 175,000 estimated tokens) exceeds the
+    // 150,000 token budget and the deterministic filter can't narrow it (no path overlap between
+    // 'src/app.ts' and either doc), but the LLM-selected single doc (100k + 100k chars = 50,000
+    // estimated tokens) comfortably fits — so the judge call is actually reached.
+    const bigPatch = 'x'.repeat(100_000);
     const adapters = fakeAdapters({
       getDiff: vi.fn(async () => [{ path: 'src/app.ts', status: 'modified', patch: bigPatch }]),
       readSourceDocument: vi.fn(async () => [
-        { convention: 'domain-modeling', path: 'CONTEXT.md', content: 'y'.repeat(1_000_000) },
-        { convention: 'domain-modeling', path: 'docs/adr/0001.md', content: 'z'.repeat(1_000_000) },
+        { convention: 'domain-modeling', path: 'CONTEXT.md', content: 'y'.repeat(100_000) },
+        { convention: 'domain-modeling', path: 'docs/adr/0001.md', content: 'z'.repeat(500_000) },
       ]),
     });
     const result = await runAction(adapters, baseConfig());
@@ -2000,7 +1998,7 @@ outputs:
     description: "The judge's summary text."
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 ```
 
@@ -2161,7 +2159,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run typecheck
