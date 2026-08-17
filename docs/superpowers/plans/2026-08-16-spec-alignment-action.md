@@ -1162,7 +1162,7 @@ describe('runAction', () => {
 
   it('fails via the deterministic immutable_spec pre-check without calling the LLM', async () => {
     const adapters = fakeAdapters({
-      getDiff: vi.fn(async () => [{ path: 'CONTEXT.md', status: 'modified', patch: '+ change' }]),
+      getDiff: vi.fn(async (): Promise<DiffFile[]> => [{ path: 'CONTEXT.md', status: 'modified', patch: '+ change' }]),
     });
     const result = await runAction(adapters, baseConfig({ immutableSpec: true }));
     expect(result.verdict).toBe('fail');
@@ -1172,7 +1172,7 @@ describe('runAction', () => {
 
   it('does not trip the immutable_spec check when the toggle is off, even if the spec changed', async () => {
     const adapters = fakeAdapters({
-      getDiff: vi.fn(async () => [{ path: 'CONTEXT.md', status: 'modified', patch: '+ change' }]),
+      getDiff: vi.fn(async (): Promise<DiffFile[]> => [{ path: 'CONTEXT.md', status: 'modified', patch: '+ change' }]),
     });
     const result = await runAction(adapters, baseConfig({ immutableSpec: false }));
     expect(result.verdict).toBe('pass');
@@ -1252,8 +1252,8 @@ describe('runAction', () => {
     // estimated tokens) comfortably fits — so the judge call is actually reached.
     const bigPatch = 'x'.repeat(100_000);
     const adapters = fakeAdapters({
-      getDiff: vi.fn(async () => [{ path: 'src/app.ts', status: 'modified', patch: bigPatch }]),
-      readSourceDocument: vi.fn(async () => [
+      getDiff: vi.fn(async (): Promise<DiffFile[]> => [{ path: 'src/app.ts', status: 'modified', patch: bigPatch }]),
+      readSourceDocument: vi.fn(async (): Promise<SourceDocument[]> => [
         { convention: 'domain-modeling', path: 'CONTEXT.md', content: 'y'.repeat(100_000) },
         { convention: 'domain-modeling', path: 'docs/adr/0001.md', content: 'z'.repeat(500_000) },
       ]),
@@ -1266,8 +1266,8 @@ describe('runAction', () => {
   it('produces an error verdict when still over budget after the LLM filter fallback', async () => {
     const bigPatch = 'x'.repeat(1_000_000);
     const adapters = fakeAdapters({
-      getDiff: vi.fn(async () => [{ path: 'src/app.ts', status: 'modified', patch: bigPatch }]),
-      readSourceDocument: vi.fn(async () => [
+      getDiff: vi.fn(async (): Promise<DiffFile[]> => [{ path: 'src/app.ts', status: 'modified', patch: bigPatch }]),
+      readSourceDocument: vi.fn(async (): Promise<SourceDocument[]> => [
         { convention: 'domain-modeling', path: 'CONTEXT.md', content: 'y'.repeat(1_000_000) },
       ]),
       llmJudge: {
@@ -1323,7 +1323,7 @@ export async function runAction(adapters: Adapters, config: Config): Promise<Eva
   }
 
   const sourceDocumentBatches = await Promise.all(
-    discoveryDecision.documentsToRead.map((doc) => adapters.readSourceDocument(doc.glob))
+    discoveryDecision.documentsToRead.map((doc) => adapters.readSourceDocument(doc.glob, doc.convention))
   );
   const sourceDocuments = sourceDocumentBatches.flat();
 
