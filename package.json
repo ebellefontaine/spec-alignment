@@ -1,0 +1,37 @@
+{
+  "name": "spec-alignment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "ncc build src/index.ts -o dist --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "private": "true",
+  "dependencies": {
+    "@actions/core": "3.0.1",
+    "@actions/exec": "3.0.0",
+    "@actions/github": "9.1.1",
+    "@ai-sdk/anthropic": "4.0.39",
+    "@ai-sdk/google": "4.0.44",
+    "@ai-sdk/openai": "4.0.42",
+    "ai": "7.0.66",
+    "fast-glob": "3.3.3",
+    "minimatch": "10.2.6",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "@vercel/ncc": "0.45.0",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10"
+  }
+}
