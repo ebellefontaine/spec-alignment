@@ -1,0 +1,100 @@
+name: spec-alignment
+description: Validates PR code changes against specification documents using LLM judgment
+
+author: ebellefontaine
+
+branding:
+  icon: check-circle
+  color: blue
+
+inputs:
+  provider:
+    description: LLM provider to use for specification alignment judgment (anthropic, openai, or google)
+    required: true
+
+  api_key:
+    description: API key for the selected LLM provider (treated as a secret)
+    required: true
+
+  source_documents:
+    description: |
+      Specification documents to validate against, one entry per line.
+      Format: '<convention>' or '<convention> - <path>' or 'Other - <path>'
+
+      Built-in conventions:
+      - speckit: reads .specify/memory/constitution.md and specs/*/spec.md
+      - openspec: reads openspec/specs/** and matching openspec/changes/*/specs/**
+      - kiro: reads .kiro/specs/<feature>/{requirements,design,tasks}.md
+      - bmad: reads docs/prd.md, docs/architecture.md, and docs/stories/*.story.md
+      - domain-modeling: reads root CONTEXT.md and docs/adr/**
+      - Other: requires an explicit path (e.g., 'Other - path/to/spec.md')
+    required: true
+
+  model:
+    description: LLM model to use. If not specified, uses the per-provider default (see documentation for defaults).
+    required: false
+
+  strictness:
+    description: How strict to be when judging specification alignment (strict, balanced, or lenient)
+    required: false
+    default: balanced
+
+  immutable_spec:
+    description: When true, blocks PRs that modify both code and source documents in a single change
+    required: false
+    default: false
+
+  comment_on_pr:
+    description: Post or update a summary comment on the PR with the check results
+    required: false
+    default: true
+
+  inline_review_comments:
+    description: Post inline review comments at specific lines when issues are identified (in addition to check annotations)
+    required: false
+    default: false
+
+  exclude_paths:
+    description: |
+      File paths to exclude from specification alignment checks, one pattern per line.
+      Default excludes common lockfiles and generated code directories.
+    required: false
+    default: |
+      package-lock.json
+      yarn.lock
+      pnpm-lock.yaml
+      dist/**
+      build/**
+      .next/**
+      node_modules/**
+      coverage/**
+
+  bypass_label:
+    description: GitHub issue label that, when applied to a PR, causes the check to be skipped
+    required: false
+    default: spec-check:skip
+
+  fail_closed_on_error:
+    description: When true, treat provider errors or tool failures as failed checks; when false, mark them as neutral
+    required: false
+    default: false
+
+  auto_approve:
+    description: Automatically approve the PR when the verdict is pass (requires approval_token)
+    required: false
+    default: false
+
+  approval_token:
+    description: GitHub token (PAT or GitHub App installation token) used to approve PRs when auto_approve is enabled. GITHUB_TOKEN cannot be used for approvals.
+    required: false
+
+outputs:
+  verdict:
+    description: The specification alignment verdict (pass, pass_with_drift, fail, skip, or error)
+
+  summary:
+    description: Text summary of the check result including details about any misalignments or drift
+
+runs:
+  using: node20
+  main: dist/index.js
