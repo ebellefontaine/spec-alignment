@@ -8,6 +8,8 @@ import type {
   JudgeResult,
   SourceDocument,
   ConventionName,
+  LlmJudgeAdapter,
+  GithubClient,
 } from '../core/types.js';
 
 /**
@@ -36,70 +38,5 @@ export interface FilesystemAdapter {
   readSourceDocument(globPattern: string, convention: ConventionName): Promise<SourceDocument[]>;
 }
 
-/**
- * LLMAdapter: Integrates with the configured LLM provider for spec validation.
- * Handles both the main judgment call and relevance-filtering escalation.
- */
-export interface LLMAdapter {
-  /**
-   * Judge whether a PR diff is consistent with and in scope of the spec documents.
-   * Called with a prompt constructed from the diff and source documents.
-   * Retries transient provider errors internally; only final outcome surfaces to caller.
-   */
-  judge(request: JudgeRequest): Promise<JudgeResult>;
-
-  /**
-   * Filter which source documents are relevant to the PR diff.
-   * Called only when deterministic filtering isn't sufficient to reduce token budget.
-   * Uses same provider/model as the main judge call.
-   */
-  filterRelevance(request: FilterRequest): Promise<FilterSelection>;
-}
-
-/**
- * GitHubAdapter: Reports check results and interacts with GitHub APIs.
- * Handles check runs, PR comments, inline review comments, and pull request approvals.
- */
-export interface GitHubAdapter {
-  /**
-   * Create or update a Check Run with the evaluation result.
-   * Includes conclusion, title, summary, and optional line-level annotations.
-   * @param result - The evaluation result to report
-   * @param failClosedOnError - If true, errors are mapped to "failure" instead of "neutral"
-   */
-  upsertCheckRun(result: EvaluationResult, failClosedOnError: boolean): Promise<void>;
-
-  /**
-   * Create or update a PR summary comment with the evaluation result.
-   * On new commits, hides the prior comment and posts a fresh one for readability.
-   * @param result - The evaluation result to summarize
-   */
-  upsertPrComment(result: EvaluationResult): Promise<void>;
-
-  /**
-   * Post inline PR review comments with line-level annotations.
-   * Called only when findings exist and inline_review_comments is enabled.
-   * @param result - The evaluation result containing findings to post as reviews
-   */
-  postInlineReviewComments(result: EvaluationResult): Promise<void>;
-
-  /**
-   * Approve the pull request using the provided token.
-   * Called only when auto_approve is true and verdict is "pass".
-   * Token must be a PAT or GitHub App installation token; GITHUB_TOKEN cannot approve.
-   * @param token - Authentication token (PAT or GitHub App token)
-   */
-  approvePr(token: string): Promise<void>;
-}
-
-/**
- * Adapters: Combines all four adapter interfaces.
- * This is the complete set of dependencies injected into runAction.
- * Each adapter handles a specific I/O boundary: git, filesystem, LLM, and GitHub.
- */
-export interface Adapters {
-  getDiff: GitAdapter['getDiff'];
-  readSourceDocument: FilesystemAdapter['readSourceDocument'];
-  llmJudge: LLMAdapter;
-  githubClient: GitHubAdapter;
-}
+// Re-export adapter interfaces from core/types
+export type { LlmJudgeAdapter, GithubClient } from '../core/types.js';
