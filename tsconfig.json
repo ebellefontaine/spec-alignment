@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "build",
     "rootDir": "src",
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "types": ["node"]
   },
   "include": ["src"]
 }
