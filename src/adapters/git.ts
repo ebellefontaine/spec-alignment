@@ -42,7 +42,7 @@ class RealGitAdapter implements GitAdapter {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      if (line === undefined) continue;
+      if (!line) continue;
 
       // Detect start of a new file diff
       if (line.startsWith('diff --git ')) {
@@ -55,15 +55,21 @@ class RealGitAdapter implements GitAdapter {
           });
         }
 
-        // Parse file path from "diff --git a/path b/path"
-        const match = line.match(/^diff --git a\/(.+) b\/(.+)$/);
-        const filePath = (match && match[1]) || '';
+        // Parse file path from "diff --git a/path b/path" or quoted paths
+        // Handles both: a/path b/path and "a/path with spaces" "b/path with spaces"
+        const match = line.match(/^diff --git (?:"a\/([^"]+)"|a\/(\S+)) (?:"b\/([^"]+)"|b\/(\S+))$/);
+        const filePath = (match && (match[1] || match[2])) || '';
 
         currentFile = {
           path: filePath,
           status: 'modified', // Default status
         };
         patchLines = [line];
+      } else if (line.startsWith('Binary files ')) {
+        // Handle binary files - mark patch as empty and skip content
+        if (currentFile !== null) {
+          patchLines.push(line);
+        }
       } else if (currentFile !== null) {
         // Detect file status
         if (line.startsWith('new file mode')) {
