@@ -92,7 +92,7 @@ describe('FUNCTIONAL.md - User Stories Validation', () => {
     });
 
     it('should mention error handling behavior', () => {
-      expect(functionalContent).toContain('failClosedOnError') || expect(functionalContent).toContain('fail_closed_on_error');
+      expect(functionalContent).toMatch(/failClosedOnError|fail_closed_on_error/);
     });
 
     it('should define error scenarios', () => {
@@ -103,7 +103,7 @@ describe('FUNCTIONAL.md - User Stories Validation', () => {
 
   describe('User Story 7: Path Exclusion', () => {
     it('should explain path exclusion', () => {
-      expect(functionalContent).toContain('exclude') || expect(functionalContent).toContain('skip');
+      expect(functionalContent).toMatch(/exclude|skip/);
     });
 
     it('should use minimatch syntax', () => {
