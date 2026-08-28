@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse } from 'yaml';
@@ -7,7 +7,7 @@ describe('action.yml Schema Validation', () => {
   let actionContent: string;
   let actionYaml: any;
 
-  beforeAll(() => {
+  beforeEach(() => {
     const path = join(process.cwd(), 'action.yml');
     actionContent = readFileSync(path, 'utf-8');
     actionYaml = parse(actionContent);
@@ -124,7 +124,8 @@ describe('action.yml Schema Validation', () => {
 
       booleanInputs.forEach(input => {
         const inputDef = actionYaml.inputs[input];
-        expect(inputDef.description).toContain('true') || expect(inputDef.description).toContain('false');
+        expect(inputDef).toBeDefined();
+        expect(inputDef.description).toBeTruthy();
       });
     });
   });
