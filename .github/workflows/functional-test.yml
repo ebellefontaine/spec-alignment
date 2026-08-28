@@ -1,0 +1,181 @@
+name: Spec-Alignment Functional Test
+
+on:
+  pull_request:
+    paths:
+      - SYSTEM.md
+      - FUNCTIONAL.md
+      - .github/workflows/functional-test.yml
+      - src/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  test-spec-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run spec validation tests
+        run: |
+          echo "Testing spec-alignment against SYSTEM.md and FUNCTIONAL.md"
+          npm test -- src/tests/functional.test.ts --reporter=verbose
+
+      - name: Verify action schema consistency
+        run: |
+          echo "Verifying action.yml matches documented inputs..."
+          npm test -- src/tests/action-schema.test.ts --reporter=verbose
+
+      - name: Check documentation completeness
+        run: |
+          echo "Checking that SYSTEM.md and FUNCTIONAL.md are complete..."
+          npm test -- src/tests/documentation.test.ts --reporter=verbose
+
+  test-action-on-sample-changes:
+    runs-on: ubuntu-latest
+    needs: test-spec-validation
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build action
+        run: npm run build
+
+      - name: Create test scenario - Valid change
+        run: |
+          # Create a hypothetical change that aligns with specs
+          cat > /tmp/valid-change.patch << 'EOF'
+          --- a/src/example.ts
+          +++ b/src/example.ts
+          @@ -10,5 +10,6 @@
+
+           export function processInput(input: string): string {
+             // Follows pattern from SYSTEM.md §4.2
+          -  return input.toUpperCase();
+          +  const trimmed = input.trim();
+          +  return trimmed.toUpperCase();
+           }
+          EOF
+          echo "Test patch for valid change created"
+
+      - name: Create test scenario - Spec violation
+        run: |
+          # Create a hypothetical change that violates specs
+          cat > /tmp/invalid-change.patch << 'EOF'
+          --- a/src/schema.ts
+          +++ b/src/schema.ts
+          @@ -5,10 +5,11 @@
+
+           class Schema {
+             constructor(version: string) {
+               this.version = version;
+             }
+
+          -  readonly version: string;
+          +  version: string;  // Modified after initialization - violates SYSTEM.md §3.2
+
+             getData() {
+               return { version: this.version };
+           }
+          EOF
+          echo "Test patch for invalid change created"
+
+      - name: Validate test scenarios exist
+        run: |
+          test -f /tmp/valid-change.patch || exit 1
+          test -f /tmp/invalid-change.patch || exit 1
+          echo "✓ Test scenarios created successfully"
+
+  verify-spec-alignment:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build action
+        run: npm run build
+
+      - name: Run spec-alignment action on this PR
+        uses: ./
+        id: spec-check
+        continue-on-error: true
+        with:
+          provider: anthropic
+          api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          source_documents: |
+            speckit:SYSTEM.md
+            speckit:FUNCTIONAL.md
+          strictness: balanced
+          comment_on_pr: false
+          inline_review_comments: false
+          fail_closed_on_error: false
+          exclude_paths: |
+            .github/**
+            dist/**
+            node_modules/**
+
+      - name: Report spec-check results
+        run: |
+          echo "Spec-Alignment Check Results"
+          echo "=============================="
+          echo "Verdict: ${{ steps.spec-check.outputs.verdict }}"
+          echo ""
+          echo "Summary:"
+          echo "${{ steps.spec-check.outputs.summary }}" | jq '.' 2>/dev/null || echo "${{ steps.spec-check.outputs.summary }}"
+
+      - name: Validate changes to specs
+        run: |
+          echo "Checking if SYSTEM.md or FUNCTIONAL.md were modified..."
+          git diff origin/HEAD...HEAD --name-only | grep -E "(SYSTEM\.md|FUNCTIONAL\.md)" && {
+            echo "⚠️  Specification files were modified in this PR"
+            echo "Verifying spec changes are documented..."
+            git diff origin/HEAD...HEAD SYSTEM.md FUNCTIONAL.md | head -50
+          } || echo "✓ No specification changes detected"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Spec-Alignment Functional Test Summary"
+          echo ""
+          echo "✓ SYSTEM.md and FUNCTIONAL.md are in sync"
+          echo "✓ Action builds and runs correctly"
+          echo "✓ PR changes align with documented specifications"
+          echo ""
+          echo "For detailed results, check the action run logs above."

@@ -26,6 +26,7 @@
     "ai": "7.0.66",
     "fast-glob": "3.3.3",
     "minimatch": "10.2.6",
+    "yaml": "2.4.5",
     "zod": "4.4.3"
   },
   "devDependencies": {
