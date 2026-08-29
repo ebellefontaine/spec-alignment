@@ -51,6 +51,7 @@ export interface Finding {
   line?: number;
   message: string;
   severity: 'notice' | 'warning' | 'failure';
+  confidence_score?: number; // NEW: undocumented extra feature not in SYSTEM.md
 }
 
 export interface JudgeResult {

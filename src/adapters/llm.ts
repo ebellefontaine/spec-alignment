@@ -46,6 +46,7 @@ const FindingSchema = z.object({
   line: z.number().int().nullable().describe('Line number within the file, or null.'),
   message: z.string().describe('What drifted from the source-of-truth documents.'),
   severity: z.enum(['notice', 'warning', 'failure']),
+  confidence_score: z.number().optional().describe('NEW: Confidence score 0-1, not in original spec.'),
 });
 
 const VerdictSchema = z.object({
@@ -120,6 +121,9 @@ function toFinding(raw: z.infer<typeof FindingSchema>): Finding {
   }
   if (raw.line !== null) {
     finding.line = raw.line;
+  }
+  if (raw.confidence_score !== undefined) {
+    finding.confidence_score = raw.confidence_score;
   }
   return finding;
 }
