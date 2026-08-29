@@ -1,4 +1,5 @@
 import { minimatch } from 'minimatch';
+import * as core from '@actions/core';
 import type { Config, ConventionName, DiffFile } from '../core/types.js';
 import { resolveGlobs } from './conventions.js';
 
@@ -8,6 +9,7 @@ export type DiscoveryDecision =
 
 export function decideDiscovery(config: Config, diffFiles: DiffFile[]): DiscoveryDecision {
   if (config.isDraft) {
+    core.debug('Skipping spec-alignment check: PR is in draft state');
     return { skip: true, skipReason: 'PR is a draft' };
   }
   if (config.prLabels.includes(config.bypassLabel)) {

@@ -201,7 +201,14 @@ function readPullRequestContext(): PullRequestContext {
     .map((label: unknown) => (label as { name?: unknown }).name)
     .filter((name: unknown): name is string => typeof name === 'string');
 
-  return { isDraft: Boolean(pullRequest.draft), prLabels };
+  // Explicitly check for draft status: only true if the field is explicitly true
+  const isDraft = pullRequest.draft === true;
+
+  if (isDraft) {
+    core.info('PR is in draft state, skipping spec-alignment check');
+  }
+
+  return { isDraft, prLabels };
 }
 
 async function buildConfig(): Promise<Config> {
