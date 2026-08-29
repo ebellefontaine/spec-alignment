@@ -26,7 +26,7 @@ jobs:
         with:
           provider: openrouter
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
-          model: openai/gpt-4-turbo
+          model: openai/gpt-4o
           source_documents: |-
             FUNCTIONAL.md
             SYSTEM.md
