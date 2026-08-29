@@ -1,0 +1,31 @@
+name: Spec Alignment Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  spec-alignment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run spec alignment check
+        uses: ebellefontaine/spec-alignment@worktree-public-readiness
+        with:
+          provider: openrouter
+          api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          model: mistralai/mistral-7b-instruct
+          source_documents: |
+            domain-modeling
+          strictness: balanced
+          comment_on_pr: true
+          fail_closed_on_error: false
