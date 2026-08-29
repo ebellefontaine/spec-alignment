@@ -114,6 +114,7 @@ const InputSchema = z
     fail_closed_on_error: booleanInput(false),
     auto_approve: booleanInput(false),
     approval_token: optionalStringInput(),
+    skip_drafts: booleanInput(true),
   })
   .superRefine((inputs, ctx) => {
     // GITHUB_TOKEN cannot approve pull requests, so auto-approval is inert
@@ -146,6 +147,7 @@ function readRawInputs(): Record<string, string> {
     fail_closed_on_error: core.getInput('fail_closed_on_error'),
     auto_approve: core.getInput('auto_approve'),
     approval_token: core.getInput('approval_token'),
+    skip_drafts: core.getInput('skip_drafts'),
   };
 }
 
@@ -239,6 +241,7 @@ async function buildConfig(): Promise<Config> {
     isDraft,
     prLabels,
     fileTree: await readFileTree(),
+    skipDrafts: inputs.skip_drafts,
   };
 }
 

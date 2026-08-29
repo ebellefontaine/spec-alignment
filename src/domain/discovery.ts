@@ -8,8 +8,8 @@ export type DiscoveryDecision =
   | { skip: false; documentsToRead: { convention: ConventionName; glob: string }[] };
 
 export function decideDiscovery(config: Config, diffFiles: DiffFile[]): DiscoveryDecision {
-  if (config.isDraft) {
-    core.debug('Skipping spec-alignment check: PR is in draft state');
+  if (config.skipDrafts && config.isDraft) {
+    core.debug('Skipping spec-alignment check: PR is in draft state (skip_drafts=true)');
     return { skip: true, skipReason: 'PR is a draft' };
   }
   if (config.prLabels.includes(config.bypassLabel)) {

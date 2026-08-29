@@ -32,6 +32,7 @@ export interface Config {
   isDraft: boolean;
   prLabels: string[];
   fileTree: string[];
+  skipDrafts: boolean;
 }
 
 export interface DiffFile {
