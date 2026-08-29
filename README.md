@@ -13,7 +13,7 @@ spec-alignment reads your configured spec documents, analyzes the PR's diff, and
 ## Features
 
 - **Multiple spec formats supported**: Spec Kit, OpenSpec, Kiro, BMAD-METHOD, domain-modeling convention, or arbitrary files/directories
-- **Multiple LLM providers**: Anthropic, OpenAI, or Google (via Vercel AI SDK)
+- **Multiple LLM providers**: Anthropic, OpenAI, Google, or OpenRouter (via Vercel AI SDK)
 - **Configurable strictness**: `strict`, `balanced`, or `lenient` evaluation
 - **Large-PR handling**: Deterministic relevance filtering + optional LLM-based filtering to keep token usage predictable
 - **Auto-approval**: Optional automatic PR approval when the check passes
@@ -49,9 +49,11 @@ jobs:
 ### Configuration
 
 Required inputs:
-- `provider`: `anthropic`, `openai`, or `google`
+- `provider`: `anthropic`, `openai`, `google`, or `openrouter`
 - `api_key`: Your LLM provider's API key (store as a GitHub secret)
 - `source_documents`: Multi-line spec source locations (see [Design Doc](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#specsource-discovery) for format)
+
+**[See Providers Guide](docs/PROVIDERS.md)** for detailed setup instructions, API key retrieval, model options, and comparison of each provider.
 
 Optional inputs:
 - `model`: LLM model to use (defaults per provider)
