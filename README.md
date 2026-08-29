@@ -1,5 +1,7 @@
 # spec-alignment
 
+[![Latest Release](https://img.shields.io/github/v/release/ebellefontaine/spec-alignment?color=blue&label=Latest&logo=github&sort=semver)](https://github.com/ebellefontaine/spec-alignment/releases)
+
 A GitHub Action that validates whether code changes in pull requests align with your project's specifications using LLM-based judgment.
 
 ## Problem
@@ -66,6 +68,26 @@ Optional inputs:
 - `fail_closed_on_error`: Treat LLM errors as failures instead of neutral (default: `false`)
 
 See the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#configuration-surface-actionyml-inputs) for complete details.
+
+## Releases
+
+### Version Selection
+
+This action uses [Semantic Versioning](docs/VERSIONING.md). Pin to the major version (`@v1`) to receive automatic patches and minor updates, or pin to an exact version for stability.
+
+```yaml
+# Receive all v1.x.x updates (recommended for new projects)
+- uses: ebellefontaine/spec-alignment@v1
+  
+# Pin to exact version for stability
+- uses: ebellefontaine/spec-alignment@v1.5.3
+```
+
+See [docs/VERSIONING.md](docs/VERSIONING.md) for the version strategy and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+
+### GitHub Releases
+
+See the [releases page](https://github.com/ebellefontaine/spec-alignment/releases) for release notes and downloadable artifacts.
 
 ## Architecture
 
