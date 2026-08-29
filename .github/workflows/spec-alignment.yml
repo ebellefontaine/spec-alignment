@@ -18,8 +18,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up git remote HEAD
+        run: git remote set-head origin main
+
       - name: Run spec alignment check
-        uses: ebellefontaine/spec-alignment@9f0194d48c41ebd0aad291481061641d9d0e026a
+        uses: ebellefontaine/spec-alignment@workflow/spec-alignment-openrouter
         with:
           provider: openrouter
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
