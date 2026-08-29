@@ -29,3 +29,5 @@ jobs:
           strictness: balanced
           comment_on_pr: true
           fail_closed_on_error: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
