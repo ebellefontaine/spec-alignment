@@ -72,8 +72,8 @@ const InputSchema = z
       .string()
       .transform((raw) => raw.trim().toLowerCase())
       .pipe(
-        z.enum(['anthropic', 'openai', 'google'], {
-          message: 'must be one of: anthropic, openai, google',
+        z.enum(['anthropic', 'openai', 'google', 'openrouter'], {
+          message: 'must be one of: anthropic, openai, google, openrouter',
         })
       ),
 
