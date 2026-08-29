@@ -15,11 +15,17 @@ export function parseSourceDocumentEntry(line: string): SourceDocumentEntry {
   }
 
   const convention = KNOWN_CONVENTIONS.find((c) => c === rawConvention.toLowerCase());
+
+  // If not a known convention, treat as a file path if it looks like one
   if (!convention) {
+    if (rawConvention.includes('.') || rawConvention.includes('/')) {
+      return { convention: 'other', explicitPath: rawConvention };
+    }
     throw new Error(
       `Unknown source_documents convention "${rawConvention}". Expected one of: ${KNOWN_CONVENTIONS.join(', ')}, or "Other - <path>".`
     );
   }
+
   return explicitPath ? { convention, explicitPath } : { convention };
 }
 

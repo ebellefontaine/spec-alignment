@@ -27,7 +27,7 @@ jobs:
           provider: openrouter
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
           model: mistralai/mistral-7b-instruct
-          source_documents: |
+          source_documents: |-
             FUNCTIONAL.md
             SYSTEM.md
             docs/PROVIDERS.md
