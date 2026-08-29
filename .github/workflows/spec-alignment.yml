@@ -1,0 +1,47 @@
+name: Spec Alignment Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  spec-alignment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up git remote HEAD
+        run: git remote set-head origin main
+
+      - name: Run spec alignment check
+        uses: ebellefontaine/spec-alignment@workflow/spec-alignment-openrouter
+        with:
+          provider: openrouter
+          api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          model: google/gemini-3.7-flash
+          source_documents: |-
+            FUNCTIONAL.md
+            SYSTEM.md
+            docs/PROVIDERS.md
+          strictness: balanced
+          comment_on_pr: true
+          fail_closed_on_error: false
+          exclude_paths: |-
+            package-lock.json
+            yarn.lock
+            pnpm-lock.yaml
+            dist/**
+            build/**
+            .next/**
+            node_modules/**
+            coverage/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

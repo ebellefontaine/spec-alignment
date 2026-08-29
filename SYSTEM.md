@@ -51,12 +51,32 @@ Report Results
 ### Input Formats
 
 **source_documents** (multi-line YAML-like):
-```
-speckit:docs/spec.md
-openspec:docs/api-spec.json
-domain-modeling:docs/domain.md
-other:/absolute/path/to/custom.md
-```
+
+Supports three formats for specifying documents:
+
+1. **Convention with optional path override:**
+   ```
+   speckit:docs/spec.md
+   openspec:docs/api-spec.json
+   domain-modeling:docs/domain.md
+   ```
+
+2. **Explicit "other" convention (backwards compatible):**
+   ```
+   other:/absolute/path/to/custom.md
+   other:FUNCTIONAL.md
+   ```
+
+3. **Plain file paths (auto-detected as "other"):**
+   Paths containing `.` or `/` are automatically treated as custom file paths:
+   ```
+   FUNCTIONAL.md
+   SYSTEM.md
+   docs/PROVIDERS.md
+   path/to/custom-spec.yaml
+   ```
+
+Auto-detection allows simpler configuration without the `other:` prefix for arbitrary specification files.
 
 **exclude_paths** (minimatch patterns):
 ```
@@ -220,12 +240,12 @@ Suggested: Create new schema version instead.
 The action uses a dependency-injection adapter pattern for testability:
 
 ### GitAdapter
-**Responsibility:** Retrieve and parse PR diffs
+**Responsibility:** Retrieve and parse PR diffs, with optional file exclusion
 
 **Interface:**
 ```typescript
 interface GitAdapter {
-  getDiff(): Promise<DiffFile[]>;
+  getDiff(excludePatterns?: string[]): Promise<DiffFile[]>;
 }
 
 interface DiffFile {
@@ -235,11 +255,15 @@ interface DiffFile {
 }
 ```
 
+**Parameters:**
+- `excludePatterns` (optional): Array of minimatch glob patterns to filter out files from the diff. Files matching any pattern are excluded from the returned array.
+
 **Implementation:** `RealGitAdapter`
 - Executes `git diff origin/HEAD...HEAD --unified=3`
 - Parses unified diff format
 - Handles quoted paths (with spaces)
-- Returns DiffFile array
+- Filters results using minimatch pattern matching if excludePatterns provided
+- Returns filtered DiffFile array
 
 ### FilesystemAdapter
 **Responsibility:** Read specification documents from repository
