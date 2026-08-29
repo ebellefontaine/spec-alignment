@@ -28,7 +28,9 @@ jobs:
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
           model: mistralai/mistral-7b-instruct
           source_documents: |
-            domain-modeling
+            Other - FUNCTIONAL.md
+            Other - SYSTEM.md
+            Other - docs/PROVIDERS.md
           strictness: balanced
           comment_on_pr: true
           fail_closed_on_error: false
