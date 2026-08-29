@@ -153,6 +153,14 @@ class RealGithubClient implements GithubClient {
             `(see https://github.blog/changelog/2025-02-12-notice-of-upcoming-deprecations-and-breaking-changes-for-github-actions/). ` +
             `Findings will be posted as a PR comment instead. ${errorMsg}`
         );
+        // Fallback to PR comment when check run API is restricted
+        try {
+          await this.upsertPrComment(result);
+        } catch (commentErr) {
+          core.warning(
+            `Could not post findings as PR comment fallback: ${describeError(commentErr)}`
+          );
+        }
         return;
       }
       throw err;
