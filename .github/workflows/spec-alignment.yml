@@ -22,7 +22,7 @@ jobs:
         run: git remote set-head origin main
 
       - name: Run spec alignment check
-        uses: ebellefontaine/spec-alignment@workflow/spec-alignment-openrouter
+        uses: ebellefontaine/spec-alignment@main
         with:
           provider: openrouter
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
