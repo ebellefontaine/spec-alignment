@@ -27,13 +27,13 @@
     "ai": "7.0.66",
     "fast-glob": "3.3.3",
     "minimatch": "10.2.6",
-    "yaml": "2.4.5",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "26.2.0",
     "@vercel/ncc": "0.45.0",
     "typescript": "5.7.2",
-    "vitest": "4.1.10"
+    "vitest": "4.1.10",
+    "yaml": "2.9.0"
   }
 }
