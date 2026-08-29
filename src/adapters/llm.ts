@@ -1,6 +1,7 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { APICallError, generateObject } from 'ai';
 import type { LanguageModel } from 'ai';
 import { z } from 'zod';
@@ -23,6 +24,7 @@ const DEFAULT_MODELS: Record<Provider, string> = {
   anthropic: 'claude-opus-5',
   openai: 'gpt-5.6',
   google: 'gemini-pro-latest',
+  openrouter: 'openai/gpt-4-turbo',
 };
 
 /** Total attempts (initial call + retries) for a transient failure. */
@@ -139,6 +141,8 @@ function resolveModel(provider: Provider, apiKey: string, modelId?: string): Lan
       return createOpenAI({ apiKey })(resolvedModelId);
     case 'google':
       return createGoogleGenerativeAI({ apiKey })(resolvedModelId);
+    case 'openrouter':
+      return createOpenRouter({ apiKey })(resolvedModelId);
   }
 }
 
