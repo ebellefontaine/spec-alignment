@@ -1,4 +1,5 @@
 import { exec } from '@actions/exec';
+import { minimatch } from 'minimatch';
 import type { DiffFile } from '../core/types.js';
 import type { GitAdapter } from './index.js';
 
@@ -7,7 +8,7 @@ import type { GitAdapter } from './index.js';
  * Uses @actions/exec to run git diff and parses the output into DiffFile[].
  */
 class RealGitAdapter implements GitAdapter {
-  async getDiff(): Promise<DiffFile[]> {
+  async getDiff(excludePatterns?: string[]): Promise<DiffFile[]> {
     let output = '';
     const exitCode = await exec('git', [
       'diff',
@@ -26,7 +27,20 @@ class RealGitAdapter implements GitAdapter {
       throw new Error(`git diff command failed with exit code ${exitCode}`);
     }
 
-    return this.parseDiff(output);
+    let files = this.parseDiff(output);
+
+    if (excludePatterns && excludePatterns.length > 0) {
+      files = files.filter((file) => !this.matchesExcludePattern(file.path, excludePatterns));
+    }
+
+    return files;
+  }
+
+  private matchesExcludePattern(filePath: string, patterns: string[]): boolean {
+    return patterns.some((pattern) => {
+      const normalized = pattern.replace(/\\/g, '/');
+      return minimatch(filePath, normalized, { dot: true });
+    });
   }
 
   /**
