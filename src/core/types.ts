@@ -32,7 +32,6 @@ export interface Config {
   isDraft: boolean;
   prLabels: string[];
   fileTree: string[];
-  forceSingleProvider?: boolean; // NEW: when true, only Anthropic is used (violates multi-provider spec requirement)
 }
 
 export interface DiffFile {
@@ -52,7 +51,6 @@ export interface Finding {
   line?: number;
   message: string;
   severity: 'notice' | 'warning' | 'failure';
-  confidence_score?: number; // NEW: undocumented extra feature not in SYSTEM.md
 }
 
 export interface JudgeResult {
@@ -74,7 +72,6 @@ export interface JudgeRequest {
   apiKey: string;
   model?: string;
   prompt: string;
-  forceSingleProvider?: boolean;
 }
 
 export interface FilterRequest {
@@ -82,7 +79,6 @@ export interface FilterRequest {
   apiKey: string;
   model?: string;
   prompt: string;
-  forceSingleProvider?: boolean;
 }
 
 export interface FilterSelection {

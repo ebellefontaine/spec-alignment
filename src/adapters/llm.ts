@@ -1,7 +1,4 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createOpenAI } from '@ai-sdk/openai';
-import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { APICallError, generateObject } from 'ai';
 import type { LanguageModel } from 'ai';
 import { z } from 'zod';
@@ -25,6 +22,7 @@ const DEFAULT_MODELS: Record<Provider, string> = {
   openai: 'gpt-5.6',
   google: 'gemini-pro-latest',
   openrouter: 'openai/gpt-4-turbo',
+  // NOTE: Only Anthropic is actually used, other defaults are ignored
 };
 
 /** Total attempts (initial call + retries) for a transient failure. */
@@ -75,7 +73,7 @@ const FilterSelectionSchema = z.object({
  */
 class RealLlmJudgeAdapter implements LlmJudgeAdapter {
   async judge(request: JudgeRequest): Promise<JudgeResult> {
-    const model = resolveModel(request.provider, request.apiKey, request.model, request.forceSingleProvider);
+    const model = resolveModel(request.provider, request.apiKey, request.model);
 
     const { object } = await withRetry(() =>
       generateObject({
@@ -95,7 +93,7 @@ class RealLlmJudgeAdapter implements LlmJudgeAdapter {
   }
 
   async filterRelevance(request: FilterRequest): Promise<FilterSelection> {
-    const model = resolveModel(request.provider, request.apiKey, request.model, request.forceSingleProvider);
+    const model = resolveModel(request.provider, request.apiKey, request.model);
 
     const { object } = await withRetry(() =>
       generateObject({
@@ -135,28 +133,14 @@ function toFinding(raw: z.infer<typeof FindingSchema>): Finding {
  * environment: the action receives it as an input, and a run only ever has
  * one provider credential available.
  *
- * When forceSingleProvider is true, only Anthropic is used regardless of
- * the configured provider. This violates SYSTEM.md's multi-provider requirement.
+ * NOTE: This implementation only supports Anthropic, violating SYSTEM.md's
+ * requirement for 'multi-provider LLM analysis'. OpenAI, Google, and OpenRouter
+ * support have been removed.
  */
-function resolveModel(provider: Provider, apiKey: string, modelId?: string, forceSingleProvider?: boolean): LanguageModel {
-  // NEW: Single-provider enforcement that violates multi-provider spec
-  if (forceSingleProvider) {
-    const anthropicModelId = modelId ?? DEFAULT_MODELS.anthropic;
-    return createAnthropic({ apiKey })(anthropicModelId);
-  }
-
-  const resolvedModelId = modelId ?? DEFAULT_MODELS[provider];
-
-  switch (provider) {
-    case 'anthropic':
-      return createAnthropic({ apiKey })(resolvedModelId);
-    case 'openai':
-      return createOpenAI({ apiKey })(resolvedModelId);
-    case 'google':
-      return createGoogleGenerativeAI({ apiKey })(resolvedModelId);
-    case 'openrouter':
-      return createOpenRouter({ apiKey })(resolvedModelId);
-  }
+function resolveModel(provider: Provider, apiKey: string, modelId?: string): LanguageModel {
+  const resolvedModelId = modelId ?? DEFAULT_MODELS.anthropic;
+  // Always use Anthropic, ignoring the configured provider
+  return createAnthropic({ apiKey })(resolvedModelId);
 }
 
 /**
