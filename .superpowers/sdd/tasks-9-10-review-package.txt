@@ -1,0 +1,155 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1c937ce..baf3dc1 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -12,28 +12,28 @@
+         "@actions/core": "3.0.1",
+         "@actions/exec": "3.0.0",
+         "@actions/github": "9.1.1",
+         "@ai-sdk/anthropic": "4.0.39",
+         "@ai-sdk/google": "4.0.44",
+         "@ai-sdk/openai": "4.0.42",
+         "@openrouter/ai-sdk-provider": "3.0.0",
+         "ai": "7.0.66",
+         "fast-glob": "3.3.3",
+         "minimatch": "10.2.6",
+-        "yaml": "2.4.5",
+         "zod": "4.4.3"
+       },
+       "devDependencies": {
+         "@types/node": "26.2.0",
+         "@vercel/ncc": "0.45.0",
+         "typescript": "5.7.2",
+-        "vitest": "4.1.10"
++        "vitest": "4.1.10",
++        "yaml": "2.9.0"
+       }
+     },
+     "node_modules/@actions/core": {
+       "version": "3.0.1",
+       "resolved": "https://registry.npmjs.org/@actions/core/-/core-3.0.1.tgz",
+       "integrity": "sha512-a6d/Nwahm9fliVGRhdhofo40HjHQasUPusmc7vBfyky+7Z+P2A1J68zyFVaNcEclc/Se+eO595oAr5nwEIoIUA==",
+       "license": "MIT",
+       "dependencies": {
+         "@actions/exec": "^3.0.0",
+         "@actions/http-client": "^4.0.0"
+@@ -1969,29 +1969,33 @@
+         "stackback": "0.0.2"
+       },
+       "bin": {
+         "why-is-node-running": "cli.js"
+       },
+       "engines": {
+         "node": ">=8"
+       }
+     },
+     "node_modules/yaml": {
+-      "version": "2.4.5",
+-      "resolved": "https://registry.npmjs.org/yaml/-/yaml-2.4.5.tgz",
+-      "integrity": "sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==",
++      "version": "2.9.0",
++      "resolved": "https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz",
++      "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
++      "dev": true,
+       "license": "ISC",
+       "bin": {
+         "yaml": "bin.mjs"
+       },
+       "engines": {
+-        "node": ">= 14"
++        "node": ">= 14.6"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/eemeli"
+       }
+     },
+     "node_modules/zod": {
+       "version": "4.4.3",
+       "resolved": "https://registry.npmjs.org/zod/-/zod-4.4.3.tgz",
+       "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==",
+       "license": "MIT",
+       "funding": {
+         "url": "https://github.com/sponsors/colinhacks"
+       }
+diff --git a/package.json b/package.json
+index 94bafa3..59ac983 100644
+--- a/package.json
++++ b/package.json
+@@ -20,20 +20,20 @@
+     "@actions/core": "3.0.1",
+     "@actions/exec": "3.0.0",
+     "@actions/github": "9.1.1",
+     "@ai-sdk/anthropic": "4.0.39",
+     "@ai-sdk/google": "4.0.44",
+     "@ai-sdk/openai": "4.0.42",
+     "@openrouter/ai-sdk-provider": "3.0.0",
+     "ai": "7.0.66",
+     "fast-glob": "3.3.3",
+     "minimatch": "10.2.6",
+-    "yaml": "2.4.5",
+     "zod": "4.4.3"
+   },
+   "devDependencies": {
+     "@types/node": "26.2.0",
+     "@vercel/ncc": "0.45.0",
+     "typescript": "5.7.2",
+-    "vitest": "4.1.10"
++    "vitest": "4.1.10",
++    "yaml": "2.9.0"
+   }
+ }
+diff --git a/src/tests/release.test.ts b/src/tests/release.test.ts
+new file mode 100644
+index 0000000..c8e6cd0
+--- /dev/null
++++ b/src/tests/release.test.ts
+@@ -0,0 +1,49 @@
++import { readFileSync } from 'fs';
++import { join } from 'path';
++import yaml from 'yaml';
++import { describe, it, expect } from 'vitest';
++
++describe('Release Workflow', () => {
++  it('has valid YAML syntax', () => {
++    const workflowPath = join(process.cwd(), '.github', 'workflows', 'release.yml');
++    const content = readFileSync(workflowPath, 'utf-8');
++
++    // Should not throw
++    const parsed = yaml.parse(content);
++    expect(parsed).toBeDefined();
++  });
++
++  it('has correct trigger configuration', () => {
++    const workflowPath = join(process.cwd(), '.github', 'workflows', 'release.yml');
++    const content = readFileSync(workflowPath, 'utf-8');
++    const parsed = yaml.parse(content);
++
++    expect(parsed.on).toBeDefined();
++    expect(parsed.on.push).toBeDefined();
++    expect(parsed.on.push.tags).toContain('v*');
++  });
++
++  it('has required permissions', () => {
++    const workflowPath = join(process.cwd(), '.github', 'workflows', 'release.yml');
++    const content = readFileSync(workflowPath, 'utf-8');
++    const parsed = yaml.parse(content);
++
++    expect(parsed.permissions).toBeDefined();
++    expect(parsed.permissions.contents).toBe('write');
++  });
++
++  it('has release job with required steps', () => {
++    const workflowPath = join(process.cwd(), '.github', 'workflows', 'release.yml');
++    const content = readFileSync(workflowPath, 'utf-8');
++    const parsed = yaml.parse(content);
++
++    expect(parsed.jobs).toBeDefined();
++    expect(parsed.jobs.release).toBeDefined();
++
++    const stepNames = parsed.jobs.release.steps.map((s: any) => s.name);
++    expect(stepNames).toContain('Checkout code');
++    expect(stepNames).toContain('Extract version');
++    expect(stepNames).toContain('Create GitHub Release');
++    expect(stepNames).toContain('Update major version branch');
++  });
++});
