@@ -1,4 +1,4 @@
-export type Provider = 'anthropic' | 'openai' | 'google';
+export type Provider = 'anthropic' | 'openai' | 'google' | 'openrouter';
 export type Strictness = 'strict' | 'balanced' | 'lenient';
 export type Verdict = 'pass' | 'pass_with_drift' | 'fail' | 'skip' | 'error';
 export type ConventionName = 'speckit' | 'openspec' | 'kiro' | 'bmad' | 'domain-modeling' | 'other';
