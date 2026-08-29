@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog extraction
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          MAJOR="${VERSION%%.*}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "major=${MAJOR}" >> $GITHUB_OUTPUT
+          echo "Releasing ${VERSION} (major version: v${MAJOR})"
+
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Extract the changelog section for this version
+          # Match pattern: ## [VERSION] - DATE through next ## or EOF
+          CHANGELOG=$(awk -v v="${VERSION}" '
+            /^## \[/ {
+              if (found) exit
+              if ($0 ~ v) { found=1; next }
+            }
+            found && NF { print }
+          ' CHANGELOG.md)
+
+          # Escape for use in JSON/environment
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+
+          echo "changelog<<EOF" >> $GITHUB_ENV
+          echo "${CHANGELOG}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Release Notes
+
+            ${{ env.changelog }}
+
+            ## Installation
+
+            Update your workflow to use this version:
+
+            ```yaml
+            - uses: ebellefontaine/spec-alignment@v${{ steps.version.outputs.major }}
+              with:
+                provider: anthropic
+                api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                source_documents: domain-modeling
+            ```
+
+            Or pin to this exact release:
+
+            ```yaml
+            - uses: ebellefontaine/spec-alignment@${{ steps.version.outputs.version }}
+            ```
+
+            See [VERSIONING.md](https://github.com/ebellefontaine/spec-alignment/blob/main/docs/VERSIONING.md) for upgrading information.
+          draft: false
+          prerelease: false
+          files: |
+            dist/index.js
+            action.yml
+            CHANGELOG.md
+
+      - name: Update major version branch
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          MAJOR="v${{ steps.version.outputs.major }}"
+
+          # Ensure major version branch exists and track it
+          git fetch origin "${MAJOR}" || git checkout -b "${MAJOR}"
+
+          # Update major version branch to point to this release
+          git checkout "${MAJOR}"
+          git reset --hard "${{ steps.version.outputs.version }}"
+          git push origin "${MAJOR}"
+
+          echo "Updated branch ${MAJOR} to point to ${VERSION}"
+
+      - name: Notify on success
+        run: |
+          echo "✅ Release created successfully!"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Major branch: v${{ steps.version.outputs.major }}"
+          echo ""
+          echo "Next steps:"
+          echo "1. Monitor GitHub Actions for any workflow errors"
+          echo "2. Verify GitHub Release page: https://github.com/ebellefontaine/spec-alignment/releases/tag/${{ steps.version.outputs.version }}"
+          echo "3. (Optional) Publish to GitHub Marketplace if configured"
