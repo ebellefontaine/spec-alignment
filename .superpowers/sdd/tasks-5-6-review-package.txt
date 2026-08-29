@@ -1,0 +1,60 @@
+diff --git a/README.md b/README.md
+index f0e02ff..cc4b768 100644
+--- a/README.md
++++ b/README.md
+@@ -1,12 +1,14 @@
+ # spec-alignment
+ 
++[![Latest Release](https://img.shields.io/github/v/release/ebellefontaine/spec-alignment?color=blue&label=Latest&logo=github&sort=semver)](https://github.com/ebellefontaine/spec-alignment/releases)
++
+ A GitHub Action that validates whether code changes in pull requests align with your project's specifications using LLM-based judgment.
+ 
+ ## Problem
+ 
+ Teams write specs (feature specs, PRDs, functional requirements docs) using a variety of tools and conventions, but nothing checks whether a pull request's actual code changes stay consistent with — or in scope of — those specs. Drift between spec and implementation is discovered late, if at all, usually by a human reviewer who has to hold the whole spec in their head while reading a diff.
+ 
+ ## Solution
+ 
+ spec-alignment reads your configured spec documents, analyzes the PR's diff, and uses an LLM (your choice of provider) to judge whether the changes are consistent with and in scope of those documents. Results are reported via GitHub's Checks API and optional PR review comments.
+ 
+@@ -60,20 +62,40 @@ Optional inputs:
+ - `strictness`: `strict`, `balanced` (default), or `lenient`
+ - `comment_on_pr`: Post a summary comment on the PR (default: `true`)
+ - `inline_review_comments`: Post review comments at specific lines (default: `false`)
+ - `immutable_spec`: Block PRs that modify both spec and code (default: `false`)
+ - `auto_approve`: Automatically approve PRs that pass (default: `false`)
+ - `approval_token`: Required if using `auto_approve` (PAT or GitHub App token)
+ - `fail_closed_on_error`: Treat LLM errors as failures instead of neutral (default: `false`)
+ 
+ See the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#configuration-surface-actionyml-inputs) for complete details.
+ 
++## Releases
++
++### Version Selection
++
++This action uses [Semantic Versioning](docs/VERSIONING.md). Pin to the major version (`@v1`) to receive automatic patches and minor updates, or pin to an exact version for stability.
++
++```yaml
++# Receive all v1.x.x updates (recommended for new projects)
++- uses: ebellefontaine/spec-alignment@v1
++  
++# Pin to exact version for stability
++- uses: ebellefontaine/spec-alignment@v1.5.3
++```
++
++See [docs/VERSIONING.md](docs/VERSIONING.md) for the version strategy and [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
++
++### GitHub Releases
++
++See the [releases page](https://github.com/ebellefontaine/spec-alignment/releases) for release notes and downloadable artifacts.
++
+ ## Architecture
+ 
+ - **Pure domain logic**: Spec discovery, relevance filtering, prompt building — all tested directly with fixtures
+ - **Injected adapters**: Git integration, filesystem, LLM provider, GitHub API — swappable for testing
+ - **Single seam**: One orchestration function (`runAction`) coordinates everything
+ - **Deterministic filtering**: Large PRs are handled via deterministic path/keyword matching first, with LLM filtering only as a fallback
+ 
+ See [Architecture](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#architecture) in the design document for details.
+ 
+ ## Contributing
