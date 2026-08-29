@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run spec alignment check
-        uses: ebellefontaine/spec-alignment@worktree-public-readiness
+        uses: ebellefontaine/spec-alignment@workflow/spec-alignment-openrouter
         with:
           provider: openrouter
           api_key: ${{ secrets.OPENROUTER_API_KEY }}
