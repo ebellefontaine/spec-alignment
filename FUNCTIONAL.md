@@ -81,6 +81,7 @@ See SYSTEM.md for the versioning pattern.
 - [ ] The action can analyze code against multiple specs simultaneously
 - [ ] Results are aggregated with a single overall verdict
 - [ ] Developers see which convention flagged each issue
+- [ ] Simple file paths (without convention prefix) are auto-detected and treated as custom specs
 
 **Supported Conventions:**
 - `speckit`: SpecKit format specifications
@@ -88,7 +89,8 @@ See SYSTEM.md for the versioning pattern.
 - `kiro`: Kiro format specifications
 - `bmad`: BMAD format specifications
 - `domain-modeling`: Domain-Driven Design modeling specs
-- `other`: Custom specifications with explicit path override
+- `other` (explicit): Custom specifications with explicit path override (e.g., `other:/path/to/spec.md`)
+- Auto-detected paths: Plain file paths containing `.` or `/` are automatically treated as custom specs (e.g., `FUNCTIONAL.md`, `docs/ARCHITECTURE.md`)
 
 ---
 
@@ -142,10 +144,19 @@ See SYSTEM.md for the versioning pattern.
 
 **Acceptance Criteria:**
 - [ ] The action accepts an `excludePaths` input with glob patterns
-- [ ] Matched paths are completely skipped from validation
+- [ ] Matched paths are completely skipped from the PR diff
 - [ ] Exclusions use minimatch syntax for flexibility (*, **, ?, [abc])
 - [ ] At least these paths are excluded by default: dist/*, node_modules/*, *.generated.ts
-- [ ] Exclusions are logged in the Check Run output for transparency
+- [ ] Exclusions are applied during diff retrieval (before token counting)
+- [ ] If a PR only touches excluded paths, the verdict is "skip" with clear explanation
+- [ ] When non-excluded files exist alongside excluded ones, only non-excluded files are analyzed
+
+**How It Works:**
+1. Action retrieves PR diff between base and head
+2. Excludes files matching any pattern in `excludePaths`
+3. If only excluded files changed → verdict is "skip" (no business logic changed)
+4. If other files changed → analyzes only those files
+5. This prevents large generated files (like bundled dist/index.js) from inflating token counts
 
 **Examples:**
 ```yaml
@@ -154,6 +165,8 @@ excludePaths: |
   node_modules/**
   *.generated.ts
   src/protobuf/**
+  build/**
+  .next/**
 ```
 
 ---
