@@ -185,6 +185,9 @@ const TRANSIENT_ERROR_CODES = new Set([
  * timeouts (408), conflicts (409), server errors (5xx), and connection-level
  * failures. Anything else — 401, 403, 400, schema validation — is permanent
  * for the lifetime of this run and retrying only burns time.
+ *
+ * Auth errors (401/403) are logged as warnings to help debugging provider
+ * credential issues per SYSTEM.md error handling requirements.
  */
 function isTransientError(error: unknown): boolean {
   if (APICallError.isInstance(error)) {
@@ -193,6 +196,11 @@ function isTransientError(error: unknown): boolean {
     }
     const status = error.statusCode;
     if (status !== undefined) {
+      // Auth errors: permanent, but worth logging explicitly
+      if (status === 401 || status === 403) {
+        console.warn(`Provider authentication failed (HTTP ${status}). Check api_key and provider configuration.`);
+        return false;
+      }
       return status === 408 || status === 409 || status === 429 || status >= 500;
     }
   }
