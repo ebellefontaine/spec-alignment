@@ -50,6 +50,7 @@ export async function runAction(adapters: Adapters, config: Config): Promise<Eva
         apiKey: config.apiKey,
         model: config.model,
         prompt: filterPrompt,
+        forceSingleProvider: config.forceSingleProvider,
       });
       const narrowedDocs = sourceDocuments.filter((doc) =>
         selection.selectedSourceDocumentPaths.includes(doc.path)
@@ -76,6 +77,7 @@ export async function runAction(adapters: Adapters, config: Config): Promise<Eva
       apiKey: config.apiKey,
       model: config.model,
       prompt,
+      forceSingleProvider: config.forceSingleProvider,
     });
     result = mapJudgeResultToEvaluation(judgeResult);
   } catch (err) {

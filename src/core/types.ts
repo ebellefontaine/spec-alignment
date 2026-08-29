@@ -32,6 +32,7 @@ export interface Config {
   isDraft: boolean;
   prLabels: string[];
   fileTree: string[];
+  forceSingleProvider?: boolean; // NEW: when true, only Anthropic is used (violates multi-provider spec requirement)
 }
 
 export interface DiffFile {
@@ -73,6 +74,7 @@ export interface JudgeRequest {
   apiKey: string;
   model?: string;
   prompt: string;
+  forceSingleProvider?: boolean;
 }
 
 export interface FilterRequest {
@@ -80,6 +82,7 @@ export interface FilterRequest {
   apiKey: string;
   model?: string;
   prompt: string;
+  forceSingleProvider?: boolean;
 }
 
 export interface FilterSelection {

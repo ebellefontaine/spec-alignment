@@ -1,0 +1,111 @@
+diff --git a/src/adapters/index.ts b/src/adapters/index.ts
+new file mode 100644
+index 0000000..3c6f2b8
+--- /dev/null
++++ b/src/adapters/index.ts
+@@ -0,0 +1,105 @@
++import type {
++  Config,
++  DiffFile,
++  EvaluationResult,
++  FilterRequest,
++  FilterSelection,
++  JudgeRequest,
++  JudgeResult,
++  SourceDocument,
++  ConventionName,
++} from '../core/types.js';
++
++/**
++ * GitAdapter: Provides git diff operations for the current PR.
++ * Reads the unified diff between the base and head refs.
++ */
++export interface GitAdapter {
++  /**
++   * Get the unified diff for the PR (base...head).
++   * Returns an array of changed files with their complete patches.
++   */
++  getDiff(): Promise<DiffFile[]>;
++}
++
++/**
++ * FilesystemAdapter: Reads source documents (specs) from the repository.
++ * Supports reading files/directories matching configured paths and conventions.
++ */
++export interface FilesystemAdapter {
++  /**
++   * Read source document(s) from disk matching a glob pattern and convention.
++   * @param globPattern - File glob pattern to match (e.g. specs directory)
++   * @param convention - The spec convention type (speckit, openspec, kiro, etc.)
++   * @returns Array of source documents with their content read from disk
++   */
++  readSourceDocument(globPattern: string, convention: ConventionName): Promise<SourceDocument[]>;
++}
++
++/**
++ * LLMAdapter: Integrates with the configured LLM provider for spec validation.
++ * Handles both the main judgment call and relevance-filtering escalation.
++ */
++export interface LLMAdapter {
++  /**
++   * Judge whether a PR diff is consistent with and in scope of the spec documents.
++   * Called with a prompt constructed from the diff and source documents.
++   * Retries transient provider errors internally; only final outcome surfaces to caller.
++   */
++  judge(request: JudgeRequest): Promise<JudgeResult>;
++
++  /**
++   * Filter which source documents are relevant to the PR diff.
++   * Called only when deterministic filtering isn't sufficient to reduce token budget.
++   * Uses same provider/model as the main judge call.
++   */
++  filterRelevance(request: FilterRequest): Promise<FilterSelection>;
++}
++
++/**
++ * GitHubAdapter: Reports check results and interacts with GitHub APIs.
++ * Handles check runs, PR comments, inline review comments, and pull request approvals.
++ */
++export interface GitHubAdapter {
++  /**
++   * Create or update a Check Run with the evaluation result.
++   * Includes conclusion, title, summary, and optional line-level annotations.
++   * @param result - The evaluation result to report
++   * @param failClosedOnError - If true, errors are mapped to "failure" instead of "neutral"
++   */
++  upsertCheckRun(result: EvaluationResult, failClosedOnError: boolean): Promise<void>;
++
++  /**
++   * Create or update a PR summary comment with the evaluation result.
++   * On new commits, hides the prior comment and posts a fresh one for readability.
++   * @param result - The evaluation result to summarize
++   */
++  upsertPrComment(result: EvaluationResult): Promise<void>;
++
++  /**
++   * Post inline PR review comments with line-level annotations.
++   * Called only when findings exist and inline_review_comments is enabled.
++   * @param result - The evaluation result containing findings to post as reviews
++   */
++  postInlineReviewComments(result: EvaluationResult): Promise<void>;
++
++  /**
++   * Approve the pull request using the provided token.
++   * Called only when auto_approve is true and verdict is "pass".
++   * Token must be a PAT or GitHub App installation token; GITHUB_TOKEN cannot approve.
++   * @param token - Authentication token (PAT or GitHub App token)
++   */
++  approvePr(token: string): Promise<void>;
++}
++
++/**
++ * Adapters: Combines all four adapter interfaces.
++ * This is the complete set of dependencies injected into runAction.
++ * Each adapter handles a specific I/O boundary: git, filesystem, LLM, and GitHub.
++ */
++export interface Adapters {
++  getDiff: GitAdapter['getDiff'];
++  readSourceDocument: FilesystemAdapter['readSourceDocument'];
++  llmJudge: LLMAdapter;
++  githubClient: GitHubAdapter;
++}

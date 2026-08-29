@@ -1,0 +1,80 @@
+diff --git a/src/adapters/fs.ts b/src/adapters/fs.ts
+new file mode 100644
+index 0000000..4ad8278
+--- /dev/null
++++ b/src/adapters/fs.ts
+@@ -0,0 +1,77 @@
++import { promises as fs } from 'fs';
++import { glob } from 'fast-glob';
++import type { ConventionName, SourceDocument } from '../core/types.js';
++import type { FilesystemAdapter } from './index.js';
++
++/**
++ * RealFilesystemAdapter: Reads spec files from the filesystem.
++ * Supports glob patterns and reads content from .md and .mdx files.
++ */
++class RealFilesystemAdapter implements FilesystemAdapter {
++  constructor(private repoRoot: string = process.cwd()) {}
++
++  async readSourceDocument(
++    globPattern: string,
++    convention: ConventionName
++  ): Promise<SourceDocument[]> {
++    try {
++      // Match files using glob pattern
++      const files = await glob(globPattern, {
++        cwd: this.repoRoot,
++        absolute: true,
++      });
++
++      const documents: SourceDocument[] = [];
++
++      for (const filePath of files) {
++        // Only process .md and .mdx files
++        if (!filePath.endsWith('.md') && !filePath.endsWith('.mdx')) {
++          continue;
++        }
++
++        try {
++          const content = await fs.readFile(filePath, 'utf-8');
++
++          // Use relative path for the document path
++          const relativePath = filePath.replace(
++            this.repoRoot,
++            ''
++          ).replace(/^[\\/]+/, '');
++
++          documents.push({
++            convention,
++            path: relativePath,
++            content,
++          });
++        } catch (error) {
++          if ((error as NodeJS.ErrnoException).code === 'EISDIR') {
++            // Skip directories
++            continue;
++          }
++          // Re-throw other errors
++          throw error;
++        }
++      }
++
++      return documents;
++    } catch (error) {
++      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
++        throw new Error(
++          `Spec path not found: ${globPattern} from ${this.repoRoot}`
++        );
++      }
++      throw error;
++    }
++  }
++}
++
++/**
++ * Factory function to create a FilesystemAdapter instance.
++ * @param repoRoot - Repository root directory (defaults to current working directory)
++ * @returns A new FilesystemAdapter instance
++ */
++export function createFilesystemAdapter(
++  repoRoot: string = process.cwd()

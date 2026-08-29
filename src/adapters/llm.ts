@@ -75,7 +75,7 @@ const FilterSelectionSchema = z.object({
  */
 class RealLlmJudgeAdapter implements LlmJudgeAdapter {
   async judge(request: JudgeRequest): Promise<JudgeResult> {
-    const model = resolveModel(request.provider, request.apiKey, request.model);
+    const model = resolveModel(request.provider, request.apiKey, request.model, request.forceSingleProvider);
 
     const { object } = await withRetry(() =>
       generateObject({
@@ -95,7 +95,7 @@ class RealLlmJudgeAdapter implements LlmJudgeAdapter {
   }
 
   async filterRelevance(request: FilterRequest): Promise<FilterSelection> {
-    const model = resolveModel(request.provider, request.apiKey, request.model);
+    const model = resolveModel(request.provider, request.apiKey, request.model, request.forceSingleProvider);
 
     const { object } = await withRetry(() =>
       generateObject({
@@ -134,8 +134,17 @@ function toFinding(raw: z.infer<typeof FindingSchema>): Finding {
  * The API key is passed explicitly rather than read from the ambient
  * environment: the action receives it as an input, and a run only ever has
  * one provider credential available.
+ *
+ * When forceSingleProvider is true, only Anthropic is used regardless of
+ * the configured provider. This violates SYSTEM.md's multi-provider requirement.
  */
-function resolveModel(provider: Provider, apiKey: string, modelId?: string): LanguageModel {
+function resolveModel(provider: Provider, apiKey: string, modelId?: string, forceSingleProvider?: boolean): LanguageModel {
+  // NEW: Single-provider enforcement that violates multi-provider spec
+  if (forceSingleProvider) {
+    const anthropicModelId = modelId ?? DEFAULT_MODELS.anthropic;
+    return createAnthropic({ apiKey })(anthropicModelId);
+  }
+
   const resolvedModelId = modelId ?? DEFAULT_MODELS[provider];
 
   switch (provider) {
