@@ -94,6 +94,11 @@ class RealGithubClient implements GithubClient {
    * with the create/update that sets the conclusion, and each remaining chunk
    * is appended by a follow-up PATCH (the Checks API appends rather than
    * replaces annotations on update).
+   *
+   * NOTE: As of Feb 2025, GitHub deprecated check run updates via GITHUB_TOKEN.
+   * If the Checks API blocks our request, we degrade to posting findings as a
+   * PR comment (which is still supported). The check run will not be created,
+   * but results are still surfaced.
    */
   async upsertCheckRun(result: EvaluationResult, failClosedOnError: boolean): Promise<void> {
     const { owner, repo } = this.ctx.repo;
@@ -110,49 +115,67 @@ class RealGithubClient implements GithubClient {
     };
 
     const existingCheckRunId = await this.findExistingCheckRunId(headSha);
-    let checkRunId: number;
+    let checkRunId: number | undefined;
 
-    if (existingCheckRunId === undefined) {
-      const created = await this.octokit.rest.checks.create({
-        owner,
-        repo,
-        name: CHECK_RUN_NAME,
-        head_sha: headSha,
-        status: 'completed',
-        conclusion,
-        completed_at: new Date().toISOString(),
-        output,
-      });
-      checkRunId = created.data.id;
-    } else {
-      await this.octokit.rest.checks.update({
-        owner,
-        repo,
-        check_run_id: existingCheckRunId,
-        status: 'completed',
-        conclusion,
-        completed_at: new Date().toISOString(),
-        output,
-      });
-      checkRunId = existingCheckRunId;
+    try {
+      if (existingCheckRunId === undefined) {
+        const created = await this.octokit.rest.checks.create({
+          owner,
+          repo,
+          name: CHECK_RUN_NAME,
+          head_sha: headSha,
+          status: 'completed',
+          conclusion,
+          completed_at: new Date().toISOString(),
+          output,
+        });
+        checkRunId = created.data.id;
+      } else {
+        await this.octokit.rest.checks.update({
+          owner,
+          repo,
+          check_run_id: existingCheckRunId,
+          status: 'completed',
+          conclusion,
+          completed_at: new Date().toISOString(),
+          output,
+        });
+        checkRunId = existingCheckRunId;
+      }
+    } catch (err) {
+      const errorMsg = describeError(err);
+      if (
+        errorMsg.includes('Check run status and conclusions can only be updated internally') ||
+        errorMsg.includes('can only be updated internally by GitHub Actions')
+      ) {
+        core.warning(
+          `Check run could not be created due to GitHub Actions API restrictions ` +
+            `(see https://github.blog/changelog/2025-02-12-notice-of-upcoming-deprecations-and-breaking-changes-for-github-actions/). ` +
+            `Findings will be posted as a PR comment instead. ${errorMsg}`
+        );
+        return;
+      }
+      throw err;
     }
 
     // The conclusion is recorded at this point. Remaining annotation batches
     // are supplementary detail, so a failure here warns rather than discarding
     // an otherwise-complete check.
-    for (const chunk of remainingChunks) {
-      try {
-        await this.octokit.rest.checks.update({
-          owner,
-          repo,
-          check_run_id: checkRunId,
-          output: { ...output, annotations: chunk },
-        });
-      } catch (err) {
-        core.warning(
-          `Check run ${checkRunId} was published, but ${chunk.length} additional annotation(s) ` +
-            `could not be appended: ${describeError(err)}`
-        );
+    if (checkRunId !== undefined) {
+      for (const chunk of remainingChunks) {
+        try {
+          await this.octokit.rest.checks.update({
+            owner,
+            repo,
+            check_run_id: checkRunId,
+            output: { ...output, annotations: chunk },
+          });
+        } catch (err) {
+          core.warning(
+            `Check run ${checkRunId} was published, but ${chunk.length} additional annotation(s) ` +
+              `could not be appended: ${describeError(err)}`
+          );
+        }
       }
     }
   }

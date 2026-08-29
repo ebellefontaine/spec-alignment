@@ -9,7 +9,7 @@ branding:
 
 inputs:
   provider:
-    description: LLM provider to use for specification alignment judgment (anthropic, openai, or google)
+    description: LLM provider to use for specification alignment judgment (anthropic, openai, google, or openrouter)
     required: true
 
   api_key:
@@ -98,3 +98,4 @@ outputs:
 runs:
   using: node20
   main: dist/index.js
+

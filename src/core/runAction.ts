@@ -13,7 +13,7 @@ import {
 const TOKEN_BUDGET = 150_000;
 
 export async function runAction(adapters: Adapters, config: Config): Promise<EvaluationResult> {
-  const diffFiles = await adapters.getDiff();
+  const diffFiles = await adapters.getDiff(config.excludePaths);
 
   const discoveryDecision = decideDiscovery(config, diffFiles);
   if (discoveryDecision.skip) {

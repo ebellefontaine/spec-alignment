@@ -98,7 +98,7 @@ export interface GithubClient {
 }
 
 export interface Adapters {
-  getDiff(): Promise<DiffFile[]>;
+  getDiff(excludePatterns?: string[]): Promise<DiffFile[]>;
   readSourceDocument(globPattern: string, convention: ConventionName): Promise<SourceDocument[]>;
   llmJudge: LlmJudgeAdapter;
   githubClient: GithubClient;
