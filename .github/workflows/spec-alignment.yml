@@ -34,5 +34,14 @@ jobs:
           strictness: balanced
           comment_on_pr: true
           fail_closed_on_error: false
+          exclude_paths: |-
+            package-lock.json
+            yarn.lock
+            pnpm-lock.yaml
+            dist/**
+            build/**
+            .next/**
+            node_modules/**
+            coverage/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
