@@ -151,15 +151,23 @@ class RealGithubClient implements GithubClient {
         core.warning(
           `Check run could not be created due to GitHub Actions API restrictions ` +
             `(see https://github.blog/changelog/2025-02-12-notice-of-upcoming-deprecations-and-breaking-changes-for-github-actions/). ` +
-            `Findings will be posted as a PR comment instead. ${errorMsg}`
+            `Findings will be posted to workflow summary instead. ${errorMsg}`
         );
-        // Fallback to PR comment when check run API is restricted
+        // Fallback to GitHub Actions native workflow summary (recommended approach)
         try {
-          await this.upsertPrComment(result);
-        } catch (commentErr) {
+          await this.postToWorkflowSummary(result);
+        } catch (summaryErr) {
           core.warning(
-            `Could not post findings as PR comment fallback: ${describeError(commentErr)}`
+            `Could not post findings to workflow summary: ${describeError(summaryErr)}`
           );
+          // Final fallback to PR comment
+          try {
+            await this.upsertPrComment(result);
+          } catch (commentErr) {
+            core.warning(
+              `Could not post findings as PR comment fallback: ${describeError(commentErr)}`
+            );
+          }
         }
         return;
       }
@@ -186,6 +194,45 @@ class RealGithubClient implements GithubClient {
         }
       }
     }
+  }
+
+  /**
+   * Post findings to GitHub Actions native workflow summary and annotations.
+   * This is the recommended approach per GitHub's Feb 2025 deprecation notice.
+   *
+   * Uses `core.summary` for the main result and `core.notice/warning/error`
+   * commands for individual findings, which appear in the workflow run output.
+   */
+  async postToWorkflowSummary(result: EvaluationResult): Promise<void> {
+    // Add main summary to workflow
+    const summaryMarkdown = this.buildWorkflowSummary(result);
+    await core.summary
+      .addHeading('Spec Alignment Check')
+      .addRaw(summaryMarkdown)
+      .write();
+
+    // Post individual findings as workflow annotations
+    for (const finding of result.findings) {
+      const location = `${finding.file || 'general'}${finding.line ? `:${finding.line}` : ''}`;
+      const message = `${location}: ${finding.message}`;
+      switch (finding.severity) {
+        case 'notice':
+          core.notice(message);
+          break;
+        case 'warning':
+          core.warning(message);
+          break;
+        case 'failure':
+          core.error(message);
+          break;
+      }
+    }
+  }
+
+  private buildWorkflowSummary(result: EvaluationResult): string {
+    const title = CHECK_TITLES[result.verdict];
+    const markdown = buildFindingsMarkdown(result);
+    return `**${title}**\n\n${result.summary}\n\n${markdown}`;
   }
 
   /**
