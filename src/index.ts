@@ -238,7 +238,7 @@ async function buildConfig(): Promise<Config> {
 function buildAdapters(): Adapters {
   const filesystemAdapter = createFilesystemAdapter(process.cwd());
   return {
-    getDiff: () => gitAdapter.getDiff(),
+    getDiff: (excludePatterns?: string[]) => gitAdapter.getDiff(excludePatterns),
     readSourceDocument: (globPattern, convention) =>
       filesystemAdapter.readSourceDocument(globPattern, convention),
     llmJudge: createLlmJudgeAdapter(),

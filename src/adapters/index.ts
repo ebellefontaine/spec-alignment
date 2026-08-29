@@ -20,8 +20,9 @@ export interface GitAdapter {
   /**
    * Get the unified diff for the PR (base...head).
    * Returns an array of changed files with their complete patches.
+   * @param excludePatterns - Glob patterns of files to exclude from the diff
    */
-  getDiff(): Promise<DiffFile[]>;
+  getDiff(excludePatterns?: string[]): Promise<DiffFile[]>;
 }
 
 /**
