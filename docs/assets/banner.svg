@@ -23,7 +23,7 @@
   <!-- Code box -->
   <g transform="translate(200, 315)">
     <rect x="-40" y="-40" width="80" height="80" rx="12" fill="rgba(14, 165, 233, 0.15)" stroke="#0ea5e9" stroke-width="2"/>
-    <text x="0" y="30" text-anchor="middle" font-family="monospace" font-size="40" font-weight="700" fill="#0ea5e9">{ }</text>
+    <text x="0" y="20" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="40" font-weight="700" fill="#0ea5e9">{ }</text>
     <text x="0" y="65" text-anchor="middle" font-family="system-ui" font-size="14" fill="#cbd5e1" font-weight="500">Code</text>
   </g>
 
