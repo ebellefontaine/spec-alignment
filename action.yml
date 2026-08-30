@@ -18,16 +18,15 @@ inputs:
 
   source_documents:
     description: |
-      Specification documents to validate against, one entry per line.
-      Format: '<convention>' or '<convention> - <path>' or 'Other - <path>'
+      Specification documents to validate against, one path per line.
+      Each line should be a file path or glob pattern within your repository.
 
-      Built-in conventions:
-      - speckit: reads .specify/memory/constitution.md and specs/*/spec.md
-      - openspec: reads openspec/specs/** and matching openspec/changes/*/specs/**
-      - kiro: reads .kiro/specs/<feature>/{requirements,design,tasks}.md
-      - bmad: reads docs/prd.md, docs/architecture.md, and docs/stories/*.story.md
-      - domain-modeling: reads root CONTEXT.md and docs/adr/**
-      - Other: requires an explicit path (e.g., 'Other - path/to/spec.md')
+      Examples:
+      - CONTEXT.md
+      - docs/adr/**
+      - docs/prd.md
+      - specs/*/spec.md
+      - .kiro/specs/*/requirements.md
     required: true
 
   model:
