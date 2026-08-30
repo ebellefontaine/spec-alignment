@@ -1,5 +1,5 @@
 name: spec-alignment
-description: Validates PR code changes against specification documents using AI-powered LLM judgment. Your code and specs are sent to your chosen LLM provider for evaluation. See privacy policy at https://github.com/ebellefontaine/spec-alignment/blob/main/docs/PRIVACY.md
+description: LLM-powered validation of code against specification documents
 
 author: ebellefontaine
 
