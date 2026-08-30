@@ -1,7 +1,5 @@
 <div align="center">
 
-![spec-alignment](./docs/assets/logo.png)
-
 # spec-alignment
 
 **LLM-powered validation of code against specifications**
