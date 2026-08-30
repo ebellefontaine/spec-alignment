@@ -1,6 +1,19 @@
+<div align="center">
+
+![spec-alignment](./docs/assets/logo.svg)
+
 # spec-alignment
 
+**LLM-powered validation of code against specifications**
+
 [![Latest Release](https://img.shields.io/github/v/release/ebellefontaine/spec-alignment?color=blue&label=Latest&logo=github&sort=semver)](https://github.com/ebellefontaine/spec-alignment/releases)
+[![Tests](https://img.shields.io/github/actions/workflow/status/ebellefontaine/spec-alignment/test.yml?label=Tests&logo=github)](https://github.com/ebellefontaine/spec-alignment/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+
+</div>
+
+![spec-alignment banner](./docs/assets/banner.svg)
 
 A GitHub Action that validates whether code changes in pull requests align with your project's specifications using LLM-based judgment.
 
@@ -11,6 +24,15 @@ Teams write specs (feature specs, PRDs, functional requirements docs) using a va
 ## Solution
 
 spec-alignment reads your configured spec documents, analyzes the PR's diff, and uses an LLM (your choice of provider) to judge whether the changes are consistent with and in scope of those documents. Results are reported via GitHub's Checks API and optional PR review comments.
+
+## How It Works
+
+1. **Specs are read from your repo** — Supports Spec Kit, OpenSpec, Kiro, BMAD-METHOD, domain-modeling convention, or custom files
+2. **PR changes are analyzed** — The action fetches the diff and identifies relevant changed files
+3. **LLM makes judgment** — An LLM evaluates alignment between code and specs at your chosen strictness level
+4. **Results appear in GitHub** — A Check is posted with the verdict; optional PR comments provide context
+
+The action appears as a GitHub Check on every PR, with optional inline review comments highlighting specific alignment concerns.
 
 ## Features
 
@@ -69,6 +91,13 @@ Optional inputs:
 
 See the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#configuration-surface-actionyml-inputs) for complete details.
 
+## Documentation
+
+- **[Design Document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md)** — Full specification, architecture, and design rationale
+- **[Providers Guide](docs/PROVIDERS.md)** — LLM provider setup, comparison, and configuration
+- **[Versioning Strategy](docs/VERSIONING.md)** — Version scheme and breaking change policy
+- **[Contributing Guide](CONTRIBUTING.md)** — How to contribute, development setup, and code organization
+
 ## Releases
 
 ### Version Selection
@@ -100,53 +129,77 @@ See [Architecture](docs/superpowers/specs/2026-08-16-spec-alignment-action-desig
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started.
+We welcome contributions! Whether it's bug reports, feature requests, documentation improvements, or code contributions, your help is appreciated.
+
+**Getting started:**
+
+1. Read the [CONTRIBUTING.md](CONTRIBUTING.md) guide for development workflow
+2. Check the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md) to understand the architecture
+3. Look for issues tagged `good-first-issue` or `help-wanted`
 
 ## Development
 
-### Setup
+### Quick Start
 
 ```bash
+# Clone and setup
+git clone https://github.com/ebellefontaine/spec-alignment.git
+cd spec-alignment
 npm install
+
+# Run tests
 npm test
+
+# Run tests in watch mode
+npm test -- --watch
 ```
 
-### Running Tests
+### Common Commands
 
 ```bash
-npm test                    # Run all tests
-npm test -- --watch        # Watch mode
+npm typecheck              # Check TypeScript types
+npm run lint:fix           # Fix linting issues
+npm run format             # Format code with Prettier
+npm run build              # Build distribution bundle
 ```
 
 ### Code Structure
 
 ```
 src/
-  index.ts                  # Action entrypoint
+  index.ts                  # Action entrypoint: reads inputs, orchestrates
   core/
-    runAction.ts            # Main orchestration
-    types.ts                # TypeScript types
+    runAction.ts            # Main orchestration seam
+    types.ts                # Config and data types
   domain/
-    conventions.ts          # Spec format resolution
-    discovery.ts            # Document discovery
+    conventions.ts          # Spec format discovery
+    discovery.ts            # Read source documents
     relevanceFilter.ts      # Token budget filtering
-    immutableSpecCheck.ts   # Pre-check for immutable mode
+    immutableSpecCheck.ts   # Spec + code modification check
     promptBuilder.ts        # LLM prompt construction
-    verdictMapper.ts        # Result mapping to GitHub Checks
+    verdictMapper.ts        # GitHub Check conclusion mapping
   adapters/
     git.ts                  # Git integration
     fs.ts                   # Filesystem operations
-    llm.ts                  # LLM provider integration
+    llm.ts                  # LLM provider bridge
     github.ts               # GitHub API client
 ```
+
+See [CLAUDE.md](CLAUDE.md) for detailed development guidance and architecture notes.
+
+## Status
+
+**v0.1.0 — Early experimental**. Breaking changes may occur as the action matures. See the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md) for full scope and roadmap.
 
 ## License
 
 MIT — See [LICENSE](LICENSE) for details.
 
-## Status
+## Support
 
-**v0.1.0 — Early experimental**. Breaking changes may occur. See [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md) for the full scope and future work.
+- **Found a bug?** Open an [issue](https://github.com/ebellefontaine/spec-alignment/issues/new)
+- **Have a feature idea?** Start a [discussion](https://github.com/ebellefontaine/spec-alignment/discussions)
+- **Need help?** Check [existing issues](https://github.com/ebellefontaine/spec-alignment/issues) or the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Acknowledgments
 
