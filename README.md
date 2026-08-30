@@ -43,13 +43,7 @@ The action appears as a GitHub Check on every PR, with optional inline review co
 - ✅ **Review the [Privacy & Data Handling](docs/PRIVACY.md) guide** for options to minimize data exposure
 - ✅ **AI verdicts should be reviewed, not blindly trusted** — LLMs can hallucinate or miss subtle issues
 
-**Choose your provider based on data sensitivity:**
-- **Maximum privacy** → Anthropic (no training retention)
-- **Cost-effective** → Google (no training retention)
-- **Opt-out available** → OpenAI (can disable retention)
-- **Multi-model** → OpenRouter (varies by model)
-
-See [Providers Guide](docs/PROVIDERS.md) for detailed data policies and setup instructions.
+Review each provider's privacy policy before choosing. See [Providers Guide](docs/PROVIDERS.md) for setup instructions and links to provider documentation.
 
 ## Features
 

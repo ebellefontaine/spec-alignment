@@ -42,7 +42,7 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 
 **Rate Limits:** Varies by tier. Check your [usage page](https://console.anthropic.com/usage).
 
-**Data Handling:** Your PR code and specifications are **not** retained for model training. See [Anthropic's Privacy Policy](https://www.anthropic.com/legal/privacy-policy) for details.
+**Privacy:** See [Anthropic's Privacy Policy](https://www.anthropic.com/legal/privacy-policy).
 
 ---
 
@@ -77,7 +77,7 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 
 **Rate Limits:** Tier-dependent. Check your [usage page](https://platform.openai.com/account/usage/overview).
 
-**Data Handling:** OpenAI's data retention policy depends on your configuration. By default, API data may be retained for up to 30 days for monitoring. See [OpenAI's API Data Usage Policy](https://openai.com/enterprise-privacy/) to opt out of data retention if needed.
+**Privacy:** See [OpenAI's Data Policy](https://openai.com/enterprise-privacy/).
 
 ---
 
@@ -112,7 +112,7 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 
 **Rate Limits:** Free tier available with limits. See [pricing](https://ai.google.dev/pricing).
 
-**Data Handling:** Google does not use data sent to Gemini API for model training. See [Google's AI Privacy Commitments](https://support.google.com/cloud/answer/13630047) for details.
+**Privacy:** See [Google's Privacy Policy](https://support.google.com/cloud/answer/13630047).
 
 ---
 
@@ -155,7 +155,7 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 - Useful for trying different models without separate accounts
 - Load balancing across similar models available
 
-**Data Handling:** OpenRouter's data retention depends on the underlying provider (see above). Review [OpenRouter's Privacy Policy](https://openrouter.ai/privacy) for details on how they handle your data before forwarding to upstream providers.
+**Privacy:** See [OpenRouter's Privacy Policy](https://openrouter.ai/privacy).
 
 ---
 

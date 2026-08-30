@@ -27,7 +27,7 @@ Teams write specifications (feature specs, PRDs, functional requirements docs) u
 - ✅ **Large-PR handling** — Deterministic filtering + LLM-based filtering keeps token costs predictable
 - ✅ **Auto-approval** — Optional automatic approval when check passes
 - ✅ **Immutable spec mode** — Enforce spec and code changes in separate PRs
-- ✅ **Privacy-first design** — Choose a provider that matches your data sensitivity; exclude sensitive paths
+- ✅ **Privacy-first design** — Choose a provider that matches your data sensitivity
 
 ### ⚠️ Generative AI Disclosure (Required by GitHub Marketplace)
 
@@ -60,15 +60,9 @@ Your code and specifications are sent to your chosen LLM provider. **Each provid
 - Private GitHub repository data beyond the PR diff being evaluated
 - Approval or review history
 
-#### Privacy Options
+#### Privacy Control
 
-You have full control over your data:
-
-1. **Choose your provider** based on data sensitivity
-2. **Exclude sensitive files** using the `exclude_paths` input
-3. **Disable public comments** if concerned about verdict visibility
-4. **Run on self-hosted runners** for maximum network control
-5. **Review the [Privacy & Data Handling Guide](https://github.com/ebellefontaine/spec-alignment/blob/main/docs/PRIVACY.md)** for detailed options
+You choose which LLM provider to use. Review your chosen provider's privacy policy to ensure it aligns with your organization's data requirements. See the [Privacy & Data Handling Guide](https://github.com/ebellefontaine/spec-alignment/blob/main/docs/PRIVACY.md) for more information.
 
 #### Important Limitations
 
