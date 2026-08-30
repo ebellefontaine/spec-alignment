@@ -1,6 +1,6 @@
 <div align="center">
 
-![spec-alignment](./docs/assets/logo.svg)
+![spec-alignment](./docs/assets/logo.png)
 
 # spec-alignment
 
@@ -13,7 +13,7 @@
 
 </div>
 
-![spec-alignment banner](./docs/assets/banner.svg)
+![spec-alignment banner](./docs/assets/banner.png)
 
 A GitHub Action that validates whether code changes in pull requests align with your project's specifications using LLM-based judgment.
 
