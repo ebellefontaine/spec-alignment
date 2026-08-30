@@ -18,14 +18,14 @@ When you use spec-alignment, the following data is sent to your configured LLM p
 
 ## How Each Provider Handles Your Data
 
-Your PR code is sent to your chosen LLM provider. **Data retention policies vary significantly:**
+Your PR code is sent to your chosen LLM provider. **Data retention policies vary — review each provider's documentation:**
 
-| Provider | Training Retention | Real-time Processing | Documentation |
-|----------|------------------|----------------------|---|
-| **Anthropic** | ❌ Not used for training | Your data processed then discarded | [Privacy Policy](https://www.anthropic.com/legal/privacy-policy) |
-| **OpenAI** | ⚠️ 30 days (can opt-out) | May be retained for system monitoring | [Data Policy](https://openai.com/enterprise-privacy/) |
-| **Google** | ❌ Not used for training | Your data processed then discarded | [Privacy Commitments](https://support.google.com/cloud/answer/13630047) |
-| **OpenRouter** | Varies by upstream | Depends on selected model's provider | [Privacy Policy](https://openrouter.ai/privacy) |
+| Provider | Privacy Documentation |
+|----------|---|
+| **Anthropic** | [Privacy Policy](https://www.anthropic.com/legal/privacy-policy) |
+| **OpenAI** | [Data Policy](https://openai.com/enterprise-privacy/) |
+| **Google** | [Privacy Commitments](https://support.google.com/cloud/answer/13630047) |
+| **OpenRouter** | [Privacy Policy](https://openrouter.ai/privacy) |
 
 **You choose the provider.** Different teams have different data sensitivity requirements. Review the provider's privacy policy before enabling the action.
 
