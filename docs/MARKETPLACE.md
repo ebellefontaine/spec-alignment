@@ -152,7 +152,6 @@ We respond to all support requests within 48 hours.
 - **Request Features** — [GitHub Issues](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=enhancement)
 - **Ask Questions** — [GitHub Discussions](https://github.com/ebellefontaine/spec-alignment/discussions)
 - **Privacy Questions** — [GitHub Issues](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=privacy)
-- **Email** — 
 
 ### Documentation
 
