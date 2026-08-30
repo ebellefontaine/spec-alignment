@@ -242,8 +242,6 @@ Have a question, found a bug, or want to request a feature? We're here to help!
 - **Feature Requests** — [Request a feature](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=enhancement)
 - **Privacy Questions** — [Ask about data handling](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=privacy)
 - **General Discussion** — [Start a discussion](https://github.com/ebellefontaine/spec-alignment/discussions/new)
-
-We respond to all issues within 48 hours. Before opening an issue, please check [existing issues](https://github.com/ebellefontaine/spec-alignment/issues) to avoid duplicates.
 - **Have a feature idea?** Start a [discussion](https://github.com/ebellefontaine/spec-alignment/discussions)
 - **Need help?** Check [existing issues](https://github.com/ebellefontaine/spec-alignment/issues) or the [CONTRIBUTING.md](CONTRIBUTING.md)
 
