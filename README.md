@@ -87,8 +87,9 @@ jobs:
           provider: anthropic
           api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           source_documents: |
-            domain-modeling
-            Other - docs/implementation-notes.md
+            CONTEXT.md
+            docs/adr/**
+            docs/implementation-notes.md
 ```
 
 ### Configuration
@@ -96,7 +97,7 @@ jobs:
 Required inputs:
 - `provider`: `anthropic`, `openai`, `google`, or `openrouter`
 - `api_key`: Your LLM provider's API key (store as a GitHub secret)
-- `source_documents`: Multi-line spec source locations (see [Design Doc](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#specsource-discovery) for format)
+- `source_documents`: File paths or glob patterns to your spec documents (one per line, e.g., `CONTEXT.md`, `docs/adr/**`)
 
 **[See Providers Guide](docs/PROVIDERS.md)** for detailed setup instructions, API key retrieval, model options, and comparison of each provider.
 
