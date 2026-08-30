@@ -34,6 +34,18 @@ spec-alignment reads your configured spec documents, analyzes the PR's diff, and
 
 The action appears as a GitHub Check on every PR, with optional inline review comments highlighting specific alignment concerns.
 
+## Example Output
+
+### ✅ Aligned with Specifications
+![Aligned check example](./docs/assets/example-aligned.png)
+
+The action reports **"Spec alignment: Aligned with source documents"** when PR changes are consistent with your specifications.
+
+### ❌ Misaligned with Specifications
+![Misaligned check example](./docs/assets/example-misaligned.png)
+
+The action reports **"Spec alignment: Misaligned with source documents"** when PR changes conflict with or exceed your specifications, with detailed findings about what went wrong.
+
 ## ⚠️ Generative AI Disclosure
 
 **This action uses a generative AI language model to evaluate your code.** Before enabling, please understand:
