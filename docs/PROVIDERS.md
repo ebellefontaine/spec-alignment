@@ -42,6 +42,8 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 
 **Rate Limits:** Varies by tier. Check your [usage page](https://console.anthropic.com/usage).
 
+**Privacy:** See [Anthropic's Privacy Policy](https://www.anthropic.com/legal/privacy-policy).
+
 ---
 
 ### OpenAI
@@ -75,6 +77,8 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 
 **Rate Limits:** Tier-dependent. Check your [usage page](https://platform.openai.com/account/usage/overview).
 
+**Privacy:** See [OpenAI's Data Policy](https://openai.com/enterprise-privacy/).
+
 ---
 
 ### Google
@@ -107,6 +111,8 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 ```
 
 **Rate Limits:** Free tier available with limits. See [pricing](https://ai.google.dev/pricing).
+
+**Privacy:** See [Google's Privacy Policy](https://support.google.com/cloud/answer/13630047).
 
 ---
 
@@ -148,6 +154,21 @@ spec-alignment supports multiple LLM providers for spec validation. This guide c
 - Often competitive pricing compared to direct providers
 - Useful for trying different models without separate accounts
 - Load balancing across similar models available
+
+**Privacy:** See [OpenRouter's Privacy Policy](https://openrouter.ai/privacy).
+
+---
+
+## Data Privacy Summary
+
+| Provider | Privacy Policy |
+|----------|---|
+| Anthropic | [View Policy](https://www.anthropic.com/legal/privacy-policy) |
+| OpenAI | [View Policy](https://openai.com/enterprise-privacy/) |
+| Google | [View Policy](https://support.google.com/cloud/answer/13630047) |
+| OpenRouter | [View Policy](https://openrouter.ai/privacy) |
+
+**Important:** Always review the provider's privacy policy before enabling the action. Your PR diffs and specification documents will be sent to your chosen provider for evaluation.
 
 **Rate Limits:** Provider-specific. Check your [account page](https://openrouter.ai/account) on OpenRouter.
 

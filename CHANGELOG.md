@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.1.1-beta.1] - 2026-08-30
+
+### Added
+- Professional PNG graphics for banner and logo
+- Development patterns documentation in AGENTS.md
+- Release management infrastructure and workflow validation
+
+### Changed
+- Enhanced README with visual assets and documentation links
+- Improved visual branding with centered code brackets
+
+### Fixed
+- Asset optimization and format improvements
+
 ## [0.1.0] - 2026-08-29
 
 ### Added
@@ -31,5 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Immutable spec mode to enforce separate PRs for spec/code changes
 - Configurable strictness levels (strict, balanced, lenient)
 
-[Unreleased]: https://github.com/ebellefontaine/spec-alignment/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ebellefontaine/spec-alignment/compare/v0.1.1-beta.1...HEAD
+[0.1.1-beta.1]: https://github.com/ebellefontaine/spec-alignment/compare/v0.1.0...v0.1.1-beta.1
 [0.1.0]: https://github.com/ebellefontaine/spec-alignment/releases/tag/v0.1.0
