@@ -34,6 +34,23 @@ spec-alignment reads your configured spec documents, analyzes the PR's diff, and
 
 The action appears as a GitHub Check on every PR, with optional inline review comments highlighting specific alignment concerns.
 
+## ⚠️ Generative AI Disclosure
+
+**This action uses a generative AI language model to evaluate your code.** Before enabling, please understand:
+
+- ✅ **Your PR diff and specifications are sent to your chosen LLM provider** (Anthropic, OpenAI, Google, or OpenRouter)
+- ✅ **Data handling varies by provider** — see [Data Retention Summary](docs/PROVIDERS.md#data-privacy-summary)
+- ✅ **Review the [Privacy & Data Handling](docs/PRIVACY.md) guide** for options to minimize data exposure
+- ✅ **AI verdicts should be reviewed, not blindly trusted** — LLMs can hallucinate or miss subtle issues
+
+**Choose your provider based on data sensitivity:**
+- **Maximum privacy** → Anthropic (no training retention)
+- **Cost-effective** → Google (no training retention)
+- **Opt-out available** → OpenAI (can disable retention)
+- **Multi-model** → OpenRouter (varies by model)
+
+See [Providers Guide](docs/PROVIDERS.md) for detailed data policies and setup instructions.
+
 ## Features
 
 - **Multiple spec formats supported**: Spec Kit, OpenSpec, Kiro, BMAD-METHOD, domain-modeling convention, or arbitrary files/directories
@@ -91,10 +108,38 @@ Optional inputs:
 
 See the [design document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md#configuration-surface-actionyml-inputs) for complete details.
 
+## When to Use spec-alignment
+
+### ✅ Ideal For
+
+- **Detailed specifications** — Specs with clear requirements and acceptance criteria
+- **Architectural validation** — Checking if code follows design patterns or architecture decisions
+- **Feature scope validation** — Ensuring changes don't implement unspecified features
+- **Preventing spec drift** — Detecting when implementations diverge from documented behavior
+- **Catching unintended scope creep** — Flagging when a "bug fix" becomes a feature
+
+### ⚠️ Not Ideal For
+
+- **Vague or incomplete specs** — If your spec is unclear, the LLM will also be confused
+- **Security-critical decisions** — Don't rely on AI alone to catch security issues
+- **Very large PRs** (>10,000 lines) — Token costs increase significantly; consider breaking into smaller PRs
+- **Binary files or generated code** — Diffs are often unreadable; use `exclude_paths` to skip these
+- **Real-time constraints** — Each PR evaluation takes 10-30 seconds depending on size and provider
+
+### 💡 Best Practices
+
+1. **Write clear specs** — The clearer your specification, the better the alignment judgment
+2. **Use consistently** — Align on when to use `strict` vs. `balanced` vs. `lenient` across your team
+3. **Review verdicts** — Always review the AI's verdict in context; use it as a guide, not a rule
+4. **Exclude sensitive files** — Use `exclude_paths` for secrets, credentials, or highly proprietary code
+5. **Monitor costs** — Each PR evaluation has a small cost; budget accordingly for high-velocity teams
+6. **Test with non-critical repos first** — Get a feel for how the action works before relying on it in production
+
 ## Documentation
 
+- **[Privacy & Data Handling](docs/PRIVACY.md)** — How your data is processed, data retention policies, and privacy options
+- **[Providers Guide](docs/PROVIDERS.md)** — LLM provider setup, comparison, configuration, and data policies
 - **[Design Document](docs/superpowers/specs/2026-08-16-spec-alignment-action-design.md)** — Full specification, architecture, and design rationale
-- **[Providers Guide](docs/PROVIDERS.md)** — LLM provider setup, comparison, and configuration
 - **[Versioning Strategy](docs/VERSIONING.md)** — Version scheme and breaking change policy
 - **[Contributing Guide](CONTRIBUTING.md)** — How to contribute, development setup, and code organization
 
@@ -195,9 +240,17 @@ See [CLAUDE.md](CLAUDE.md) for detailed development guidance and architecture no
 
 MIT — See [LICENSE](LICENSE) for details.
 
-## Support
+## Support & Feedback
 
-- **Found a bug?** Open an [issue](https://github.com/ebellefontaine/spec-alignment/issues/new)
+Have a question, found a bug, or want to request a feature? We're here to help!
+
+- **Report Issues** — [Open an issue](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=bug)
+- **Feature Requests** — [Request a feature](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=enhancement)
+- **Privacy Questions** — [Ask about data handling](https://github.com/ebellefontaine/spec-alignment/issues/new?labels=privacy)
+- **General Discussion** — [Start a discussion](https://github.com/ebellefontaine/spec-alignment/discussions/new)
+- **Direct Contact** — Email: 
+
+We respond to all issues within 48 hours. Before opening an issue, please check [existing issues](https://github.com/ebellefontaine/spec-alignment/issues) to avoid duplicates.
 - **Have a feature idea?** Start a [discussion](https://github.com/ebellefontaine/spec-alignment/discussions)
 - **Need help?** Check [existing issues](https://github.com/ebellefontaine/spec-alignment/issues) or the [CONTRIBUTING.md](CONTRIBUTING.md)
 
