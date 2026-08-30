@@ -1,0 +1,25 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="checkGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer circle with gradient -->
+  <circle cx="120" cy="120" r="120" fill="url(#logoGradient)"/>
+
+  <!-- Inner white circle -->
+  <circle cx="120" cy="120" r="100" fill="white"/>
+
+  <!-- Code brackets as subtle background -->
+  <text x="70" y="150" font-family="monospace" font-size="80" font-weight="bold" fill="currentColor" opacity="0.08">{</text>
+  <text x="160" y="150" font-family="monospace" font-size="80" font-weight="bold" fill="currentColor" opacity="0.08">}</text>
+
+  <!-- Checkmark -->
+  <path d="M 85 120 L 105 140 L 155 85" stroke="url(#checkGradient)" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
