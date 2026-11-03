@@ -27,7 +27,7 @@
     "ai": "7.0.66",
     "fast-glob": "3.3.3",
     "minimatch": "10.2.6",
-    "zod": "4.4.3"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/node": "26.2.0",
